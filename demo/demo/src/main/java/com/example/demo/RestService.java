@@ -1,13 +1,13 @@
 package com.example.demo;
 
-import org.springframework.boot.json.JsonParser;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.http.HttpMethod;
 
 @Service
 public class RestService {
@@ -31,7 +31,31 @@ public class RestService {
         this.clientId = System.getenv("CLIENT_ID");
     }
 
-    public String getBearerToken(String exchange) { 
+    public Activity[] getAtheleteActivities() {
+        
+        String url = "https://www.strava.com/api/v3/activities/";
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("Authorization", "Bearer " + this.bearerToken);
+
+        HttpEntity<String> request = new HttpEntity<>(headers);
+        
+        ResponseEntity<Activity[]> response = this.restTemplate.exchange(url, HttpMethod.GET, request, Activity[].class);
+        
+        if (response.getStatusCode() == HttpStatus.OK) {
+            System.out.println("Successfully got activities");
+            return response.getBody();
+        }
+        else {
+            System.out.println("Error getting Activities" + response.getStatusCode() + " " + response.getBody());
+            return null;
+            
+        }
+
+    }
+
+    public void getBearerToken(String exchange) { 
         String url = "https://www.strava.com/oauth/token";
 
         url += "?client_id=" + this.clientId;
@@ -40,16 +64,19 @@ public class RestService {
         url += "&grant_type=authorization_code";
 
         System.out.println("url: " + url);
-        
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        
-        HttpEntity<String> request = new HttpEntity<>(headers);
 
-        ResponseEntity<String> response = this.restTemplate.exchange(url, HttpMethod.POST, request, String.class );
 
-        return response.toString();
+        ResponseEntity<Bearer> response = this.restTemplate.postForEntity(url, null, Bearer.class);
 
+
+        if (response.getStatusCode() == HttpStatus.OK) {
+            System.out.println("Successfully got Bearer Token: " + response.getBody().getAccess_token());
+            this.bearerToken = response.getBody().getAccess_token();
+        }
+        else {
+            System.out.println("Error getting Bearer Token" + response.getStatusCode() + " " + response.getBody());
+            
+        }
     }
 
 }
