@@ -2,11 +2,17 @@ package com.example.demo;
 
 import java.io.Serializable;
 
+
+// @Table
 public class Bearer implements Serializable {
 
+ //   @PrimaryKey
+  //  @CassandraType(type = Name.UUID)
+  //  private UUID uid = UUID.randomUUID();
+
     private String token_type;
-    private int expires_at;
-    private int expires_in;
+    private long expires_at;
+    private long expires_in;
     private String refresh_token;
     private String access_token;
     private Athlete athlete;
@@ -27,19 +33,19 @@ public class Bearer implements Serializable {
         return this.token_type;
     }
 
-    public void setExpires_at(int expiry) {
+    public void setExpires_at(long expiry) {
         this.expires_at = expiry;
     }
 
-    public int getExpires_at() {
+    public long getExpires_at() {
         return this.expires_at;
     }
 
-    public void setExpires_in(int expires) {
+    public void setExpires_in(long expires) {
         this.expires_in = expires;
     }
 
-    public int getExpires_in() {
+    public long getExpires_in() {
         return this.expires_in;
     }
 

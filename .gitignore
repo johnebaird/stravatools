@@ -2,3 +2,5 @@
 .vscode/launch.json
 .env
 demo/demo/src/main/resources/application.properties
+demo/demo/src/main/resources/application.yaml
+Test.java

@@ -2,6 +2,9 @@ package com.example.demo;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+
+import java.time.Instant;
+
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -15,7 +18,7 @@ public class RestService {
     private final RestTemplate restTemplate;
     private String clientSecret;
     private String clientId;
-    private String bearerToken;
+    private Bearer bearerToken;
 
     public void setClientSecret(String secret) {
         this.clientSecret = secret;
@@ -37,7 +40,7 @@ public class RestService {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("Authorization", "Bearer " + this.bearerToken);
+        headers.set("Authorization", "Bearer " + this.bearerToken.getAccess_token());
 
         HttpEntity<String> request = new HttpEntity<>(headers);
         
@@ -55,7 +58,37 @@ public class RestService {
 
     }
 
+    public void refreshBearerToken() {
+
+        if ((Instant.now().getEpochSecond() + 60) < bearerToken.getExpires_at()) {
+            System.out.println("Bearer token still valid");
+            return;
+        }
+
+        String url = "https://www.strava.com/oauth/token";
+
+        url += "?client_id=" + this.clientId;
+        url += "&client_secret=" + this.clientSecret;
+        url += "&grant_type=refresh_token";
+        url += "&refresh_token=" + (String)bearerToken.getRefresh_token();
+        
+        System.out.println("refresh url: " + url);
+
+        ResponseEntity<Bearer> response = this.restTemplate.postForEntity(url, null, Bearer.class);
+
+        if (response.getStatusCode() == HttpStatus.OK) {
+            System.out.println("Successfully refreshed Bearer Token: " + response.getBody().getAccess_token());
+            this.bearerToken = response.getBody();
+        }
+        else {
+            System.out.println("Error refreshing Bearer Token" + response.getStatusCode() + " " + response.getBody());
+            
+        }
+
+    }
+
     public void getBearerToken(String exchange) { 
+
         String url = "https://www.strava.com/oauth/token";
 
         url += "?client_id=" + this.clientId;
@@ -71,7 +104,7 @@ public class RestService {
 
         if (response.getStatusCode() == HttpStatus.OK) {
             System.out.println("Successfully got Bearer Token: " + response.getBody().getAccess_token());
-            this.bearerToken = response.getBody().getAccess_token();
+            this.bearerToken = response.getBody();
         }
         else {
             System.out.println("Error getting Bearer Token" + response.getStatusCode() + " " + response.getBody());
