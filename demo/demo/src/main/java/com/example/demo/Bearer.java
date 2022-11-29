@@ -2,27 +2,33 @@ package com.example.demo;
 
 import java.io.Serializable;
 
+import org.springframework.data.cassandra.core.mapping.CassandraType;
+import org.springframework.data.cassandra.core.mapping.PrimaryKey;
+import org.springframework.data.cassandra.core.mapping.Table;
+import org.springframework.data.cassandra.core.mapping.CassandraType.Name;
 
-// @Table
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import java.util.UUID;
+
+@JsonIgnoreProperties(ignoreUnknown=true)
+
+@Table
 public class Bearer implements Serializable {
 
- //   @PrimaryKey
-  //  @CassandraType(type = Name.UUID)
-  //  private UUID uid = UUID.randomUUID();
-
+    @PrimaryKey 
+    @CassandraType(type = Name.UUID)
+    private UUID uid = UUID.randomUUID();
+    
     private String token_type;
     private long expires_at;
     private long expires_in;
     private String refresh_token;
     private String access_token;
-    private Athlete athlete;
 
-    public void setAthelete(Athlete a) {
-        this.athlete = a;
-    }
-
-    public Athlete getAthlete() {
-        return this.athlete;
+    public Bearer() {}
+    
+    public Bearer(UUID uid) {
+        this.uid = uid;
     }
 
     public void setToken_type(String type) {

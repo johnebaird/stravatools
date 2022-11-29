@@ -9,16 +9,23 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-@Service
+
 public class RestService {
-    
+
     private final RestTemplate restTemplate;
     private String clientSecret;
     private String clientId;
     private Bearer bearerToken;
+
+    public Bearer getBearerToken() {
+        return bearerToken;
+    }
+
+    public void setBearerToken(Bearer bearerToken) {
+        this.bearerToken = bearerToken;
+    }
 
     public void setClientSecret(String secret) {
         this.clientSecret = secret;
@@ -30,8 +37,6 @@ public class RestService {
 
     public RestService() {
         this.restTemplate = new RestTemplate();
-        this.clientSecret = System.getenv("CLIENT_SECRET");
-        this.clientId = System.getenv("CLIENT_ID");
     }
 
     public Activity[] getAtheleteActivities() {
@@ -87,7 +92,7 @@ public class RestService {
 
     }
 
-    public void getBearerToken(String exchange) { 
+    public void postForBearerToken(String exchange) { 
 
         String url = "https://www.strava.com/oauth/token";
 
@@ -98,9 +103,7 @@ public class RestService {
 
         System.out.println("url: " + url);
 
-
         ResponseEntity<Bearer> response = this.restTemplate.postForEntity(url, null, Bearer.class);
-
 
         if (response.getStatusCode() == HttpStatus.OK) {
             System.out.println("Successfully got Bearer Token: " + response.getBody().getAccess_token());
