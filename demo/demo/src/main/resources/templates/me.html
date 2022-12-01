@@ -1,11 +1,44 @@
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org">
-<head> 
-    <title>Strava auth code</title> 
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-</head>
+
+<head th:replace="fragments/header"> </head>
+
 <body>
-    <p th:text="'Strava auth code: ' + ${mycode} " />
-    <p th:text="'Activities: ' + ${activities} " />
+    <p th:text="|Hello ${athlete.firstname} ${athlete.lastname}|" />
+    <div>
+        <table class="bikes">
+            <tr> 
+                <th>ID</th>
+                <th>Bike</th> 
+                <th>Distance</th> 
+            </tr>
+            <tr th:each="bike : ${bikes}"> 
+                <td th:text="${bike.id}"></td>
+                <td th:text="${bike.name}"></td>
+                <td th:text="${bike.distance} / 1000 +  'k'"></td>
+            </tr>
+        </table>
+    </div>
+
+    <br>
+
+    <div>
+        <table class="activities">
+            <tr> 
+                <th>Name</th> 
+                <th>Type</th> 
+                <th>Gear</th>
+            </tr>
+            <tr th:each="activity : ${activities}"> 
+                <td th:text="${activity.name}"></td>
+                <td th:text="${activity.type}"></td>
+                <td th:text="${activity.gear_id}"></td>
+            </tr>
+        </table>
+    </div>
+
+    <div th:replace="fragments/footer"></div>
+
 </body>
+
 </html>

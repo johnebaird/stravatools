@@ -4,6 +4,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
@@ -12,13 +17,50 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.authorizeRequests()
+
+        http.antMatcher("/me*")
+            .authorizeRequests()
             .anyRequest()
-            .permitAll()
+            .hasRole("USER")
+
             .and()
-            .csrf()
-            .disable();
+            .formLogin()
+            .loginPage("/loginUser")
+            .loginProcessingUrl("/user_login")
+            .failureUrl("/loginUser?error=loginError")
+            .defaultSuccessUrl("/me")
+
+            .and()
+            .logout()
+            .logoutUrl("/user_logout")
+            .logoutSuccessUrl("/protectedLinks")
+            .deleteCookies("JSESSIONID")
+
+            .and()
+            .exceptionHandling()
+            .accessDeniedPage("/403")
+
+            .and()
+            .csrf().disable();
+       
         return http.build();
+    }
+    
+    @Bean
+    public UserDetailsService userDetailsService() throws Exception {
+        InMemoryUserDetailsManager manager = new InMemoryUserDetailsManager();
+        manager.createUser(User
+            .withUsername("user")
+            .password(encoder().encode("password"))
+            .roles("USER")
+            .build());
+
+        return manager;
+    }
+
+    @Bean
+    public static PasswordEncoder encoder() {
+        return new BCryptPasswordEncoder();
     }
     
 }

@@ -19,12 +19,20 @@ public class Bearer implements Serializable {
     @CassandraType(type = Name.UUID)
     private UUID uid = UUID.randomUUID();
     
+    public UUID getUid() {
+        return uid;
+    }
+
+    public void setUid(UUID uid) {
+        this.uid = uid;
+    }
+
     private String token_type;
     private long expires_at;
     private long expires_in;
     private String refresh_token;
     private String access_token;
-
+    
     public Bearer() {}
     
     public Bearer(UUID uid) {

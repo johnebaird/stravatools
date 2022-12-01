@@ -39,6 +39,30 @@ public class RestService {
         this.restTemplate = new RestTemplate();
     }
 
+    public Athlete postforAthlete() {
+
+        String url = "https://www.strava.com/api/v3/athlete/";
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("Authorization", "Bearer " + this.bearerToken.getAccess_token());
+
+        HttpEntity<String> request = new HttpEntity<>(headers);
+        
+        ResponseEntity<Athlete> response = this.restTemplate.exchange(url, HttpMethod.GET, request, Athlete.class);
+        
+        if (response.getStatusCode() == HttpStatus.OK) {
+            System.out.println("Successfully got athelete info");
+            return response.getBody();
+        }
+        else {
+            System.out.println("Error getting Athlete" + response.getStatusCode() + " " + response.getBody());
+            return null;
+            
+        }
+
+    }
+
     public Activity[] getAtheleteActivities() {
         
         String url = "https://www.strava.com/api/v3/activities/";
@@ -77,8 +101,6 @@ public class RestService {
         url += "&grant_type=refresh_token";
         url += "&refresh_token=" + (String)bearerToken.getRefresh_token();
         
-        System.out.println("refresh url: " + url);
-
         ResponseEntity<Bearer> response = this.restTemplate.postForEntity(url, null, Bearer.class);
 
         if (response.getStatusCode() == HttpStatus.OK) {
@@ -100,8 +122,6 @@ public class RestService {
         url += "&client_secret=" + this.clientSecret;
         url += "&code=" + exchange;
         url += "&grant_type=authorization_code";
-
-        System.out.println("url: " + url);
 
         ResponseEntity<Bearer> response = this.restTemplate.postForEntity(url, null, Bearer.class);
 

@@ -1,0 +1,18 @@
+table.bikes {
+    border: 1px solid black;
+    table-layout: fixed;
+    width: 200px;
+  }
+  
+table.activities {
+    border: 1px solid black;
+    table-layout: fixed;
+    width: 800px;
+  }
+
+th,
+td {
+    border: 1px solid black;
+    width: 100px;
+    overflow: hidden;
+}

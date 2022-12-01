@@ -1,26 +1,55 @@
 package com.example.demo;
 
-public class Athlete {
-    
-    public int id;
-    public String username;
-    public int resource_state;
-    public String firstname;
-    public String lastname;
-    public String bio;
-    public String city;
-    public String state;
-    public String country;
-    public String sex;
-    public boolean premium;
-    public boolean summit;
-    public String created_at;
-    public String updated_at;
-    public int badge_type_id;
-    public float weight;
-    public String profile_medium;
-    public String profile;
-    public boolean friend;
-    public boolean follower;
+import java.io.Serializable;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+@JsonIgnoreProperties(ignoreUnknown=true)
+
+public class Athlete implements Serializable {
+
+    private String id;
+    private String username;
+    private String firstname;
+    private String lastname;
+    private int ftp;
+    private Bikes[] bikes;
+
+    public String getId() {
+        return id;
+    }
+    public void setId(String id) {
+        this.id = id;
+    }
+    public String getUsername() {
+        return username;
+    }
+    public void setUsername(String username) {
+        this.username = username;
+    }
+    public String getFirstname() {
+        return firstname;
+    }
+    public void setFirstname(String firstname) {
+        this.firstname = firstname;
+    }
+    public String getLastname() {
+        return lastname;
+    }
+    public void setLastname(String lastname) {
+        this.lastname = lastname;
+    }
+    public int getFtp() {
+        return ftp;
+    }
+    public void setFtp(int ftp) {
+        this.ftp = ftp;
+    }
+    public Bikes[] getBikes() {
+        return bikes;
+    }
+    public void setBikes(Bikes[] bikes) {
+        this.bikes = bikes;
+    }
+
     
 }
