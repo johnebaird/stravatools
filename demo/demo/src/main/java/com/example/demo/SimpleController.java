@@ -59,17 +59,9 @@ public class SimpleController {
         
     }
 
-    @PostMapping("/user_login")
-    public String processLogin(@RequestParam(name="username", required=false) String username,
-                                @RequestParam(name="password", required=false) String password, Model model) {
-
-            return "redirect:/me";
-
-    }
-    
-    @GetMapping("/loginUser")
+    @GetMapping("/login")
     public String loginUser(Model model) {
-        return "loginUser";
+        return "login";
     }
 
     @GetMapping("/exchange_token")

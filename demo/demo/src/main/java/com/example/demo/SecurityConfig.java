@@ -18,30 +18,17 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
-        http.antMatcher("/me*")
-            .authorizeRequests()
-            .anyRequest()
-            .hasRole("USER")
-
-            .and()
-            .formLogin()
-            .loginPage("/loginUser")
-            .loginProcessingUrl("/user_login")
-            .failureUrl("/loginUser?error=loginError")
-            .defaultSuccessUrl("/me")
-
-            .and()
-            .logout()
-            .logoutUrl("/user_logout")
-            .logoutSuccessUrl("/protectedLinks")
-            .deleteCookies("JSESSIONID")
-
-            .and()
-            .exceptionHandling()
-            .accessDeniedPage("/403")
-
-            .and()
-            .csrf().disable();
+		http
+			.authorizeHttpRequests((requests) -> requests
+				.antMatchers("/").permitAll()
+				.anyRequest().authenticated()
+            )
+			.formLogin((form) -> form
+				.loginPage("/login")
+				.permitAll()
+                .defaultSuccessUrl("/me")
+			)
+			.logout((logout) -> logout.permitAll());
        
         return http.build();
     }
