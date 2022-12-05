@@ -1,0 +1,10 @@
+<html>
+    <head th:replace="fragments/header"> </head>
+<body>
+<h1>Need to link Strava account to proceed</h1>
+<p>
+    <a href="https://www.strava.com/oauth/authorize?client_id=96771&response_type=code&redirect_uri=http://localhost:8080/exchange_token&scope=activity:read_all,profile:read_all">Autorize Strava</a>
+</p>
+<div th:replace="fragments/footer"></div>
+</body>
+</html>

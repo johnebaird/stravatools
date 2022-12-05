@@ -10,6 +10,7 @@ import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.Authentication;
 import org.springframework.ui.Model;
 
 @Controller
@@ -17,6 +18,9 @@ public class SimpleController {
 
     @Autowired
 	private BearerRepository bearerRepository;
+
+    @Autowired
+    private UserRepository userRepository;
 
 
     @Value("${spring.application.name}")
@@ -34,13 +38,14 @@ public class SimpleController {
     public void init() {
         this.strava.setClientId(clientId);
         this.strava.setClientSecret(clientSecret);
-        try {
+/*        try {
             Bearer b = bearerRepository.findById(UUID.fromString("2af29c16-dc7c-435b-b78a-09ec380541d0")).get();
             this.strava.setBearerToken(b);
         }
         catch (NoSuchElementException e) {
             // this is fine
         }
+*/
     }
 
     @GetMapping("/")
@@ -50,12 +55,8 @@ public class SimpleController {
         model.addAttribute("clientSecret", clientSecret);
         model.addAttribute("clientId", clientId);
 
-        if (this.strava.getBearerToken() == null) {
-            return "index";
-        }
-        else {
-            return "redirect:/me";
-        }
+        return "index";
+
         
     }
 
@@ -64,14 +65,35 @@ public class SimpleController {
         return "login";
     }
 
+    @GetMapping("/register")
+    public String registerUser(Model model) {
+        return "register";
+    }
+
+    @PostMapping("/register")
+    public String createregisterUser(@RequestParam(name="username", required=true) String username, @RequestParam(name="password", required=true) String password, Model model) {
+
+        User u = new User(UUID.randomUUID(), username, password);
+        userRepository.save(u);
+
+        return "redirect:/index";
+        
+    }
+
     @GetMapping("/exchange_token")
-    public String exchangeToken(@RequestParam(name="code", required=false) String code, Model model) {
+
+    public String exchangeToken(Authentication authentication, @RequestParam(name="code", required=false) String code, Model model) {
         strava.postForBearerToken(code);
         
         // single user now set default UUID
         Bearer token = strava.getBearerToken();
-        token.setUid(UUID.fromString("2af29c16-dc7c-435b-b78a-09ec380541d0"));
 
+        User loggedInUser = (User) authentication.getDetails();
+        
+        token.setUid(UUID.randomUUID());
+        loggedInUser.setBearerToken(token.getUid());
+
+        userRepository.save(loggedInUser);
         bearerRepository.save(token);
 
         return "redirect:/me";
@@ -79,6 +101,8 @@ public class SimpleController {
 
     @GetMapping("/me")
     public String me(Model model) {
+
+        
 
         strava.refreshBearerToken();
         bearerRepository.save(strava.getBearerToken());
