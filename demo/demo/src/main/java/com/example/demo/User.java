@@ -3,18 +3,13 @@ package com.example.demo;
 import java.io.Serializable;
 import java.util.UUID;
 
-import org.springframework.data.cassandra.core.mapping.CassandraType;
 import org.springframework.data.cassandra.core.mapping.PrimaryKey;
 import org.springframework.data.cassandra.core.mapping.Table;
-import org.springframework.data.cassandra.core.mapping.CassandraType.Name;
 
 @Table
 public class User implements Serializable {
 
     @PrimaryKey 
-    @CassandraType(type = Name.UUID)
-    private UUID uid = UUID.randomUUID();
-
     private String username;
 
     private String password;
@@ -31,8 +26,7 @@ public class User implements Serializable {
 
     private UUID bearerToken;
 
-    public User(UUID uid, String username, String password) {
-        this.uid = uid;
+    public User(String username, String password) {
         this.username = username;
         this.password = password;
 
@@ -78,14 +72,6 @@ public class User implements Serializable {
 
     public boolean isCredentialsExpired() {
         return credentialsExpired;
-    }
-
-    public UUID getUid() {
-        return uid;
-    }
-
-    public void setUid(UUID uid) {
-        this.uid = uid;
     }
 
     public String getPassword() {

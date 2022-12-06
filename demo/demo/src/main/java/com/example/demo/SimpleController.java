@@ -3,7 +3,6 @@ package com.example.demo;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.NoSuchElementException;
 import java.util.UUID;
 
 import javax.annotation.PostConstruct;
@@ -11,6 +10,7 @@ import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.ui.Model;
 
 @Controller
@@ -21,6 +21,9 @@ public class SimpleController {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
 
     @Value("${spring.application.name}")
@@ -48,6 +51,12 @@ public class SimpleController {
 */
     }
 
+    @RequestMapping(value = "/username", method = RequestMethod.GET)
+    @ResponseBody
+    public String currentUserName(Authentication authentication) {
+        return authentication.getName();
+    }
+
     @GetMapping("/")
     public String homePage(Model model) {
 
@@ -73,7 +82,7 @@ public class SimpleController {
     @PostMapping("/register")
     public String createregisterUser(@RequestParam(name="username", required=true) String username, @RequestParam(name="password", required=true) String password, Model model) {
 
-        User u = new User(UUID.randomUUID(), username, password);
+        User u = new User(username, passwordEncoder.encode(password));
         userRepository.save(u);
 
         return "redirect:/index";
@@ -98,10 +107,9 @@ public class SimpleController {
 
         return "redirect:/me";
     }
-
+    
     @GetMapping("/me")
     public String me(Model model) {
-
         
 
         strava.refreshBearerToken();
