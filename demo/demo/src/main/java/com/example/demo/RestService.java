@@ -88,6 +88,40 @@ public class RestService {
 
     }
 
+    public void changeAllTrainerActivities(long after, String bike) {
+        
+        Activity[] activities;
+        int page = 1;
+
+        while(true) {
+            
+            System.out.println("Bike change querying page: " + page);
+
+            activities = this.getAtheleteActivities(after, page);
+
+            for(Activity a: activities) {
+
+                if (a.isTrainer() && (a.getSport_type().equals("Ride") || a.getSport_type().equals("VirtualRide"))) {
+                    
+                    System.out.println("Found cadidate to change: " + a.getId() + " " + a.getName());
+                    
+                    if (!a.getGear_id().equals(bike)) {
+                        this.changeBikeForActivity(a.getId(), bike);
+                    }
+                }
+            }
+
+            try { Thread.sleep(1000L); } catch (InterruptedException e) {e.printStackTrace();}
+
+            page += 1;
+
+            if (activities.length < 25) { break; }
+            if (page > 50) {break; }
+
+        }
+
+    }
+
 
     public Activity[] getAtheleteActivities(long after, int page) {
 
