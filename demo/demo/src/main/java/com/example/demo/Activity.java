@@ -10,37 +10,68 @@ public class Activity implements Serializable {
     private String name;
     private String type;
     private String gear_id;
-
-    public void setId(long i) {
-        this.id = i;
-    }
-
+    private String sport_type;
+    private boolean commute;
+    private boolean trainer;
+    private boolean hide_from_home;
+    private String description;
+    
+    
     public long getId() {
-        return this.id;
-    }    
-
-    public void setName(String n) {
-        this.name = n;
+        return id;
     }
-
+    public void setId(long id) {
+        this.id = id;
+    }
     public String getName() {
-        return this.name;
+        return name;
     }
-
-    public void setType(String t) {
-        this.type = t;
+    public void setName(String name) {
+        this.name = name;
     }
-
     public String getType() {
-        return this.type;
+        return type;
     }
-
-    public void setGear_id(String g) {
-        this.gear_id = g;
+    public void setType(String type) {
+        this.type = type;
     }
-
     public String getGear_id() {
-        return this.gear_id;
+        return gear_id;
     }
+    public void setGear_id(String gear_id) {
+        this.gear_id = gear_id;
+    }
+    public String getSport_type() {
+        return sport_type;
+    }
+    public void setSport_type(String sport_type) {
+        this.sport_type = sport_type;
+    }
+    public boolean isCommute() {
+        return commute;
+    }
+    public void setCommute(boolean commute) {
+        this.commute = commute;
+    }
+    public boolean isTrainer() {
+        return trainer;
+    }
+    public void setTrainer(boolean trainer) {
+        this.trainer = trainer;
+    }
+    public boolean isHide_from_home() {
+        return hide_from_home;
+    }
+    public void setHide_from_home(boolean hide_from_home) {
+        this.hide_from_home = hide_from_home;
+    }
+    public String getDescription() {
+        return description;
+    }
+    public void setDescription(String description) {
+        this.description = description;
+    }
+    
+    
         
 }

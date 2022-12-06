@@ -3,6 +3,7 @@ package com.example.demo;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import javax.annotation.PostConstruct;
@@ -110,8 +111,26 @@ public class SimpleController {
         return "redirect:/me";
     }
     
+    @PostMapping("/setBikes")
+    public String setDefaultBikes(Authentication authentication, @RequestParam(name="indoor", required=false) String indoor, 
+                                                                @RequestParam(name="outdoor", required=false) String outdoor, Model model) {
+
+        User currentUser = userRepository.findById(authentication.getName()).get();
+        
+        currentUser.setIndoorBike(indoor);
+        currentUser.setOutdoorBike(outdoor);
+
+        userRepository.save(currentUser);
+
+        return "redirect:/me";
+    }
+
     @GetMapping("/me")
-    public String me(Authentication authentication, Model model) {
+    public String me(Authentication authentication, @RequestParam(name="page", required=false) Optional<Integer> page, Model model) {
+        
+        int currentPage = 1;
+
+        if (page.isPresent()) { currentPage = page.get(); }
         
         User currentUser = userRepository.findById(authentication.getName()).get();
 
@@ -127,11 +146,12 @@ public class SimpleController {
 
         Athlete me = strava.postforAthlete();
         Bikes[] bikes = me.getBikes();
-        Activity[] activities = strava.getAtheleteActivities();
+        Activity[] activities = strava.getAtheleteActivities(0, currentPage);
 
         model.addAttribute("athlete", me);
         model.addAttribute("bikes", bikes);
         model.addAttribute("activities", activities);
+        model.addAttribute("page", currentPage);
                         
         return "me";
     }

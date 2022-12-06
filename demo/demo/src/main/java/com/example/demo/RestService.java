@@ -63,9 +63,41 @@ public class RestService {
 
     }
 
-    public Activity[] getAtheleteActivities() {
+    public String changeBikeForActivity(long activity, String bike) {
+
+        String url = String.format("https://www.strava.com/api/v3/activities/%d", activity);
+        String body = String.format("{\"gear_id\": \"%s\"}", bike);
         
-        String url = "https://www.strava.com/api/v3/activities/";
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("Authorization", "Bearer " + this.bearerToken.getAccess_token());
+
+        HttpEntity<String> request = new HttpEntity<>(body, headers);
+        
+        ResponseEntity<String> response = this.restTemplate.exchange(url, HttpMethod.PUT, request, String.class);
+        
+        if (response.getStatusCode() == HttpStatus.OK) {
+            System.out.println("Successfully changed bike for " + activity);
+            return response.getBody();
+        }
+        else {
+            System.out.println("Error changing bike for" + activity + " - error:" + response.getStatusCode() + " " + response.getBody());
+            return null;
+            
+        }
+
+    }
+
+
+    public Activity[] getAtheleteActivities(long after, int page) {
+
+        String url;
+
+        if (after == 0) {
+                url = String.format("https://www.strava.com/api/v3/activities/?page=%d", page); 
+        } else {
+                url = String.format("https://www.strava.com/api/v3/activities/?after=%d&page=%d", after, page); 
+        }
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
