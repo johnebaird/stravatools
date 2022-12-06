@@ -59,19 +59,18 @@ public class SimpleController {
 
     @GetMapping("/")
     public String homePage(Model model) {
-
-        model.addAttribute("appname", appName);
-        model.addAttribute("clientSecret", clientSecret);
-        model.addAttribute("clientId", clientId);
-
         return "index";
-
-        
+       
     }
 
     @GetMapping("/login")
     public String loginUser(Model model) {
         return "login";
+    }
+
+    @GetMapping("/stravaauth")
+    public String authToStrava(Model model) {
+        return "stravaauth";
     }
 
     @GetMapping("/register")
@@ -82,36 +81,45 @@ public class SimpleController {
     @PostMapping("/register")
     public String createregisterUser(@RequestParam(name="username", required=true) String username, @RequestParam(name="password", required=true) String password, Model model) {
 
-        User u = new User(username, passwordEncoder.encode(password));
-        userRepository.save(u);
+        if (userRepository.existsById(username)) {
+            return "redirect:/register?error=userExists";
+        }
+        else {
+            User u = new User(username, passwordEncoder.encode(password));
+            userRepository.save(u);
 
-        return "redirect:/index";
+            return "redirect:/login";
+        }
         
     }
 
     @GetMapping("/exchange_token")
-
     public String exchangeToken(Authentication authentication, @RequestParam(name="code", required=false) String code, Model model) {
+        
         strava.postForBearerToken(code);
-        
-        // single user now set default UUID
+                
         Bearer token = strava.getBearerToken();
+        User currentUser = userRepository.findById(authentication.getName()).get();
 
-        User loggedInUser = (User) authentication.getDetails();
-        
         token.setUid(UUID.randomUUID());
-        loggedInUser.setBearerToken(token.getUid());
+        currentUser.setBearerToken(token.getUid());
 
-        userRepository.save(loggedInUser);
+        userRepository.save(currentUser);
         bearerRepository.save(token);
 
         return "redirect:/me";
     }
     
     @GetMapping("/me")
-    public String me(Model model) {
+    public String me(Authentication authentication, Model model) {
         
+        User currentUser = userRepository.findById(authentication.getName()).get();
 
+        if (currentUser.getBearerToken() == null) { return "redirect:/stravaauth"; }
+
+        Bearer currentBearer = bearerRepository.findById(currentUser.getBearerToken()).get();
+
+        strava.setBearerToken(currentBearer);
         strava.refreshBearerToken();
         bearerRepository.save(strava.getBearerToken());
 

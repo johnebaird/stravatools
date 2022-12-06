@@ -3,7 +3,18 @@
 <body>
 <h1>Welcome to Stravatools</h1>
 
-<a href:"\login">Create Account to proceed</a>
+<div>
+    <a th:href="@{/register}">Create Account to proceed</a>
+</div>
+
+<div>
+    <a th:href="@{/login}">I already have an account</a>
+</div>
+
+<div>
+    <a th:href="@{/stravaauth}">Authenticate account to Strava</a>
+</div>
+
 
 <div th:replace="fragments/footer"></div>
 </body>

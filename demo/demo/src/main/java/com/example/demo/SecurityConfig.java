@@ -22,16 +22,17 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
 		http
-			.authorizeHttpRequests((requests) -> requests
-				.antMatchers("/me", "/stravaauth").permitAll()
-				.anyRequest()
-            )
-			.formLogin((form) -> form
+			.authorizeRequests()
+				.antMatchers("/", "/index", "/login","/register").permitAll()	
+				.anyRequest().authenticated()
+				.and()
+            .formLogin()
 				.loginPage("/login")
+				.defaultSuccessUrl("/me", true)
 				.permitAll()
-			)
-			.logout((logout) -> logout.permitAll());
-       
+				.and()
+			.logout();
+      
         return http.build();
     }
 
