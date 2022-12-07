@@ -15,8 +15,14 @@ public class Activity implements Serializable {
     private boolean trainer;
     private boolean hide_from_home;
     private String description;
+    private String start_date;
     
-    
+        public String getStart_date() {
+        return start_date;
+    }
+    public void setStart_date(String start_date) {
+        this.start_date = start_date;
+    }
     public long getId() {
         return id;
     }

@@ -4,8 +4,11 @@
 <head th:replace="fragments/header"> </head>
 
 <body>
-    <p th:text="|Hello ${athlete.firstname} ${athlete.lastname}|" />
+    <h3><p th:text="|Hello ${athlete.firstname} ${athlete.lastname}|" /></h3>
+
+
     <div>
+        <h5><p>Select default indoor and outdoor bikes to correct activities<p></h5>
         <form th:action="@{/setBikes}" method="POST">
             <table class="bikes">
                 <tr> 
@@ -29,10 +32,39 @@
 
     <br>
 
-    <div>
+    
+    <div class="changeindoor">
+        <h5><p> Change all indoor activities to <span th:text="${defaultIndoor}"></p></h5>
+        <form th:action="@{/changeAllIndoor}" method="POST">
+            <p>From:</p> <input type="date" name="indoorstart">
+            <p>To:</p> <input type="date" name="indoorend">
+            <button type="submit">Apply</button>
+        </form>
+    </div>
+
+    <div class="changeoutdoor">
+        <h5><p>Change all outdoor activities to <span th:text="${defaultOutdoor}"></span></p></h5>
+        <form th:action="@{/changeAllOutdoor}" method="POST">
+            <p>From:</p> <input type="date" name="outdoorstart">
+            <p>To:</p> <input type="date" name="outdoorend">
+            <button type="submit">Apply</button>
+        </form>
+    </div>
+
+    <span th:if="${changedActivities}">
+        <p>changed <span th:text="${changedActivities}"> activities</span></p>
+    </span>
+
+    <br>
+
+    <div class="activitylist">
+        <h5><p>Activity List:</p></h5>
+        <a float="left" th:href="@{/me(page=${page} - 1)}">Prev Page</a>
+        <a float="right" th:href="@{/me(page=${page} + 1)}">Next Page</a>
         <table class="activities">
             <tr> 
                 <th>ID</th>
+                <th>Date</th>
                 <th>Name</th> 
                 <th>Type</th> 
                 <th>Gear</th>
@@ -44,6 +76,7 @@
             </tr>
             <tr th:each="activity : ${activities}">
                 <td th:text="${activity.id}"></td>
+                <td th:text="${activity.start_date}"></td>
                 <td th:text="${activity.name}"></td>
                 <td th:text="${activity.type}"></td>
                 <td th:text="${activity.gear_id}"></td>
@@ -56,7 +89,7 @@
         </table>
     </div>
 
-    <a th:href="@{/me(page=${page} - 1)}">Prev Page</a><a th:href="@{/me(page=${page} + 1)}">Next Page</a>
+
 
     <div th:replace="fragments/footer"></div>
 

@@ -3,13 +3,18 @@ package com.example.demo;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.time.Instant;
 
+import org.apache.hc.core5.net.URIBuilder;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+
 import org.springframework.web.client.RestTemplate;
+
 
 
 public class RestService {
@@ -88,16 +93,18 @@ public class RestService {
 
     }
 
-    public void changeAllTrainerActivities(long after, String bike) {
+    public int changeAllTrainerActivities(long before, long after, String bike) {
         
         Activity[] activities;
         int page = 1;
+        int changedActivities = 0;
 
         while(true) {
             
             System.out.println("Bike change querying page: " + page);
 
-            activities = this.getAtheleteActivities(after, page);
+            activities = this.getAtheleteActivities(before, after, page);
+            try { Thread.sleep(100L); } catch (InterruptedException e) {e.printStackTrace();}
 
             for(Activity a: activities) {
 
@@ -107,48 +114,62 @@ public class RestService {
                     
                     if (!a.getGear_id().equals(bike)) {
                         this.changeBikeForActivity(a.getId(), bike);
+                        try { Thread.sleep(100L); } catch (InterruptedException e) {e.printStackTrace();}
+                        changedActivities += 1;
                     }
                 }
             }
 
-            try { Thread.sleep(1000L); } catch (InterruptedException e) {e.printStackTrace();}
-
             page += 1;
+
+            System.out.println("page " + page);
 
             if (activities.length < 25) { break; }
             if (page > 50) {break; }
 
         }
 
+        return changedActivities;
     }
 
+    public Activity[] getAtheleteActivities(long before, long after, int page) {
 
-    public Activity[] getAtheleteActivities(long after, int page) {
+        URI uri;
 
-        String url;
-
-        if (after == 0) {
-                url = String.format("https://www.strava.com/api/v3/activities/?page=%d", page); 
-        } else {
-                url = String.format("https://www.strava.com/api/v3/activities/?after=%d&page=%d", after, page); 
-        }
+        URIBuilder builder = new URIBuilder()
+                                .setScheme("https")
+                                .setHost("www.strava.com")
+                                .setPath("/api/v3/activities/");
+        
+        if (before > 0 ) { builder.setParameter("before", Long.toString(before));}
+        if (after > 0 ) { builder.setParameter("after", Long.toString(after));}       
+        builder.setParameter("page", Integer.toString(page));
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.set("Authorization", "Bearer " + this.bearerToken.getAccess_token());
 
-        HttpEntity<String> request = new HttpEntity<>(headers);
+        HttpEntity<String> entity = new HttpEntity<>(headers);
         
-        ResponseEntity<Activity[]> response = this.restTemplate.exchange(url, HttpMethod.GET, request, Activity[].class);
-        
-        if (response.getStatusCode() == HttpStatus.OK) {
-            System.out.println("Successfully got activities");
-            return response.getBody();
+        try {
+
+            uri = builder.build();
+            ResponseEntity<Activity[]> response = this.restTemplate.exchange(uri, HttpMethod.GET, entity, Activity[].class);
+
+    
+            if (response.getStatusCode() == HttpStatus.OK) {
+                System.out.println("Successfully got activities");
+                return response.getBody();
+            }
+            else {
+                System.out.println("Error getting Activities" + response.getStatusCode() + " " + response.getBody());
+                return null;
+                
+            }
         }
-        else {
-            System.out.println("Error getting Activities" + response.getStatusCode() + " " + response.getBody());
+        catch (URISyntaxException u) {
+            u.printStackTrace();
             return null;
-            
         }
 
     }

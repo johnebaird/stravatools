@@ -2,6 +2,11 @@
 <html>
   <body>
     <div th:fragment="footer">
+      
+      <form th:action="@{/logout}" method="post">
+        <input type="submit" value="Sign Out"/>
+      </form>
+
       &copy; 2020 John Baird
       <script>
         $(document).foundation();

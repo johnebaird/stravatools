@@ -10,6 +10,14 @@ table.activities {
     width: 800px;
   }
 
+  div {
+  padding: 10px;
+}
+
+h3 {
+  padding: 10px;
+}
+
 th,
 td {
     border: 1px solid black;
@@ -17,3 +25,23 @@ td {
     overflow: hidden;
 }
 
+input[type=date] {
+  width: 300px;
+}
+
+button[type="submit"] {
+  background-color: green;
+  color: rgb(223, 223, 223);
+  padding: 5px 10px;
+  border-radius: 4px;
+}
+
+div.changeindoor {
+    width: 50%;
+    float: left;
+}
+
+div.changeoutdoor {
+  width: 50%;
+  float: right;
+}

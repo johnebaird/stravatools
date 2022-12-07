@@ -3,6 +3,8 @@ package com.example.demo;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -125,6 +127,22 @@ public class SimpleController {
         return "redirect:/me";
     }
 
+    @PostMapping("/changeAllIndoor")
+    public String changeAllIndoor(Authentication authentication, @RequestParam(name="indoorstart", required=true) String indoorstart,
+                                                                @RequestParam(name="indoorend", required=true) String indoorend, Model model) {
+
+        User currentUser = userRepository.findById(authentication.getName()).get();
+
+        long start = LocalDate.parse(indoorstart).atStartOfDay().toEpochSecond(ZoneOffset.UTC);
+        long end = LocalDate.parse(indoorend).atStartOfDay().toEpochSecond(ZoneOffset.UTC);
+
+        int changed = strava.changeAllTrainerActivities(end, start, currentUser.getIndoorBike());
+
+        model.addAttribute("changedActivities", changed);
+        
+        return "redirect:/me";                                                           
+    }
+
     @GetMapping("/me")
     public String me(Authentication authentication, @RequestParam(name="page", required=false) Optional<Integer> page, Model model) {
         
@@ -146,12 +164,26 @@ public class SimpleController {
 
         Athlete me = strava.postforAthlete();
         Bikes[] bikes = me.getBikes();
-        Activity[] activities = strava.getAtheleteActivities(0, currentPage);
+        Activity[] activities = strava.getAtheleteActivities(0, 0, currentPage);
+
+        String defaultIndoor = "None";
+        String defaultOutdoor = "None";
+
+        for (Bikes b : bikes) {
+            if ( b.getId().equals(currentUser.getIndoorBike()) ) {
+                defaultIndoor = b.getName();
+            }
+            if ( b.getId().equals(currentUser.getOutdoorBike()) ) {
+                defaultOutdoor = b.getName();
+            }
+        }
 
         model.addAttribute("athlete", me);
         model.addAttribute("bikes", bikes);
         model.addAttribute("activities", activities);
         model.addAttribute("page", currentPage);
+        model.addAttribute("defaultIndoor", defaultIndoor);
+        model.addAttribute("defaultOutdoor", defaultOutdoor);
                         
         return "me";
     }
