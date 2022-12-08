@@ -15,6 +15,26 @@
     <link th:href="@{/styles/main.css}" rel="stylesheet" />
 </head>
 <body>
-
+    <div class="top-bar">
+        <div class="top-bar-left">
+            <ul class="dropdown menu" data-dropdown-menu>
+                <li class="menu-text">Stravatools</li>
+                <li><a href="#">Activities</a></li>
+                <li><a href="#">Default Bikes</a></li>
+                <li><a href="#">Maintenance Reminder</a></li>
+                <li><a href="#">Feed spam muting</a></li>
+            </ul>
+        </div>
+        <div class="top-bar-right">
+            <div sec:authorize="true">
+                Hello <span sec:authentication="name">Bob</span>
+            </div>
+            <div sec:authorize="false">
+                <ul class="menu">
+                    <li><a th:href="@{/login}">Login</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

@@ -23,7 +23,7 @@ public class SecurityConfig {
 
 		http
 			.authorizeRequests()
-				.antMatchers("/", "/index", "/login","/register").permitAll()	
+				.antMatchers("/", "/index", "/login","/register", "/img/*", "/styles/*").permitAll()	
 				.anyRequest().authenticated()
 				.and()
             .formLogin()

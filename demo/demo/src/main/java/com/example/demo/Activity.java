@@ -35,6 +35,7 @@ public class Activity implements Serializable {
     public void setName(String name) {
         this.name = name;
     }
+    
     public String getType() {
         return type;
     }
