@@ -116,7 +116,7 @@ public class RestService {
 
 
 
-    public int changeAllIndoorActivities(long before, long after, String bike) {
+    public int changeBikeForActivities(long before, long after, String bike, String type) {
         
         Activity[] activities;
         int page = 1;
@@ -129,7 +129,12 @@ public class RestService {
             activities = this.getAthleteActivities(before, after, page);
             try { Thread.sleep(100L); } catch (InterruptedException e) {e.printStackTrace();}
 
-            changedActivities += changeIndoorCurrentPage(bike, activities);
+            if (type == "indoor") {
+                changedActivities += changeIndoorCurrentPage(bike, activities);
+            }
+            else if (type == "outdoor") {
+                changedActivities += changeOutdoorCurrentPage(bike, activities);
+            }
 
             page += 1;
 
@@ -149,7 +154,7 @@ public class RestService {
 
             if (a.isTrainer() && (a.getSport_type().equals("Ride") || a.getSport_type().equals("VirtualRide"))) {
                 
-                System.out.println("Found cadidate to change: " + a.getId() + " " + a.getName());
+                System.out.println("Found indoor cadidate to change: " + a.getId() + " " + a.getName());
                 
                 if (!a.getGear_id().equals(bike)) {
                     this.changeBikeForActivity(a.getId(), bike);
@@ -160,6 +165,25 @@ public class RestService {
         }
         return changedActivities;
     }
+
+    public int changeOutdoorCurrentPage(String bike, Activity[] activities) {
+        int changedActivities = 0;
+        for(Activity a: activities) {
+
+            if (!a.isTrainer() && (a.getSport_type().equals("Ride") || a.getSport_type().equals("VirtualRide"))) {
+                
+                System.out.println("Found outdoor cadidate to change: " + a.getId() + " " + a.getName());
+                
+                if (!a.getGear_id().equals(bike)) {
+                    this.changeBikeForActivity(a.getId(), bike);
+                    try { Thread.sleep(100L); } catch (InterruptedException e) {e.printStackTrace();}
+                    changedActivities += 1;
+                }
+            }
+        }
+        return changedActivities;
+    }
+
 
     public Activity[] getAthleteActivities(long before, long after, int page) {
 

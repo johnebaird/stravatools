@@ -8,9 +8,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 
-import jnr.ffi.Struct.u_int16_t;
-import jnr.ffi.Struct.u_int32_t;
-
 @Configuration
 @EnableScheduling
 public class BackgroundTasks { 
@@ -29,45 +26,43 @@ public class BackgroundTasks {
 
     private RestService strava = new RestService();
 
-    @Scheduled(fixedDelay = 5000)
+    // run at the top of the hour every hour
+    @Scheduled(cron = "0 * * * *")
     public void correctBikes() { 
+
+        System.out.println("Running bike correction task");
 
         this.strava.setClientId(clientId);
         this.strava.setClientSecret(clientSecret);
 
         List<User> userList = userRepository.findAll();
         
-        for (User u : userList) {
+        for (User user : userList) {
 
             // check if we need to change anything for user
-            if (u.isAutoChangeIndoorBike() || u.isAutoChangeOutdoorBike()) {
-                
-                if (u.getBearerToken() == null) { break; }
+            if (user.isAutoChangeIndoorBike() || user.isAutoChangeOutdoorBike()) {
+                            
+                if (user.getBearerToken() == null) { break; }
 
-                Bearer currentBearer = bearerRepository.findById(u.getBearerToken()).get();
+                Bearer currentBearer = bearerRepository.findById(user.getBearerToken()).get();
         
                 strava.setBearerToken(currentBearer);
                 strava.refreshBearerToken();
                 bearerRepository.save(strava.getBearerToken());
             }
 
-            if (u.isAccountExpired()) {
-
-                // Activity[] activities = strava.getAthleteActivities();
-
-
+            if (user.isAutoChangeIndoorBike()) {
+                Activity[] activities = strava.getAthleteActivities();
+                strava.changeIndoorCurrentPage(user.getIndoorBike(), activities);
             }
 
-            
-
-                //change outdoor bike
-
-            
-            
-
+            if (user.isAutoChangeOutdoorBike()) {
+                Activity[] activities = strava.getAthleteActivities();
+                strava.changeOutdoorCurrentPage(user.getOutdoorBike(), activities);
+            }
         }
         
-        System.out.println("Running bike correction task");
+        
 
     }
 }

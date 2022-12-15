@@ -120,16 +120,33 @@ public class SimpleController {
     }
 
     @PostMapping("/changeAllIndoor")
-    public String changeAllIndoor(Authentication authentication, @RequestParam(name="indoorstart", required=true) String indoorstart,
-                                                                @RequestParam(name="indoorend", required=true) String indoorend, Model model, 
+    public String changeAllIndoor(Authentication authentication, @RequestParam(name="start", required=true) String start,
+                                                                @RequestParam(name="end", required=true) String end, Model model, 
                                                                 @ModelAttribute("athlete") Athlete athlete) {
 
         User currentUser = userRepository.findById(authentication.getName()).get();
 
-        long start = LocalDate.parse(indoorstart).atStartOfDay().toEpochSecond(ZoneOffset.UTC);
-        long end = LocalDate.parse(indoorend).atStartOfDay().toEpochSecond(ZoneOffset.UTC);
+        long epocStart = LocalDate.parse(start).atStartOfDay().toEpochSecond(ZoneOffset.UTC);
+        long epocEnd = LocalDate.parse(end).atStartOfDay().toEpochSecond(ZoneOffset.UTC);
 
-        int changed = strava.changeAllIndoorActivities(end, start, currentUser.getIndoorBike());
+        int changed = strava.changeBikeForActivities(epocEnd, epocStart, currentUser.getIndoorBike(), "indoor");
+
+        model.addAttribute("changedActivities", changed);
+        
+        return "redirect:/me/defaultbikes";                                                           
+    }
+
+    @PostMapping("/changeAllOutdoor")
+    public String changeAllOutdoor(Authentication authentication, @RequestParam(name="start", required=true) String start,
+                                                                @RequestParam(name="end", required=true) String end, Model model, 
+                                                                @ModelAttribute("athlete") Athlete athlete) {
+
+        User currentUser = userRepository.findById(authentication.getName()).get();
+
+        long epocStart = LocalDate.parse(start).atStartOfDay().toEpochSecond(ZoneOffset.UTC);
+        long epocEnd = LocalDate.parse(end).atStartOfDay().toEpochSecond(ZoneOffset.UTC);
+
+        int changed = strava.changeBikeForActivities(epocEnd, epocStart, currentUser.getOutdoorBike(), "outdoor");
 
         model.addAttribute("changedActivities", changed);
         
