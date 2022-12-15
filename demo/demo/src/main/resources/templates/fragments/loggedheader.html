@@ -27,7 +27,12 @@
         </div>
         <div class="top-bar-right">
             <ul class="menu">
-                <li><a th:href="@{/login}">Login</a></li>
+                <li><span>Hello </span><span th:text="|${athlete.firstname} ${athlete.lastname}|">username</span></li>
+                <li>      
+                    <form th:action="@{/logout}" method="post">
+                        <button class="submit button hollow small"> Sign Out </button>
+                    </form>
+                </li>
             </ul>
         </div>
     </div>

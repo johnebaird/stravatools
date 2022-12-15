@@ -3,9 +3,7 @@
 
 <head th:replace="fragments/header"> </head>
 
-<body>
-
-<p>User login page</p>
+<body class="main">
 
 <div th:if="${param.error}">
     Invalid username and password.
@@ -15,21 +13,32 @@
     You have been logged out.
 </div>
 
-<form th:action="@{/login}" method="POST">
-    <table>
-        <tr>
-            <td>Email:</td>
-            <td><input type="text" name="username" value=""></td>
-        </tr>
-        <tr>
-            <td>Password:</td>
-            <td><input type="password" name="password" /></td>
-        </tr>
-        <tr>
-            <td><input name="submit" type="submit" value="submit" /></td>
-        </tr>
-    </table>
-</form>
+<div class="grid-container" >
+    <div class="grid-x grid-margin-x">
+        <div class="card">
+            <div class="card-divider">
+            Login to Stravatools
+            </div>
+            <img id="logoimage" th:src="@{/img/bicycle01.png}" />
+            <div class="card-section">
+                <form th:action="@{/login}" method="POST">
+                    <div class="input-group">
+                        <span class="input-group-label">Email: </span>
+                        <input class="input-group-field" name="username" type="text">
+                    </div>
+                    <div class="input-group">
+                        <span class="input-group-label">Password: </span>
+                        <input class="input-group-field" name="password" type="password">
+                    </div>
+
+                    <td><button class="submit button">Log In</button></td>
+
+                </form>
+                <p> <a th:href="@{/}">I want to register for an account</a></p>
+            </div>
+        </div>
+    </div>
+</div>
 
 <div th:replace="fragments/footer"></div>
 

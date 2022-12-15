@@ -1,0 +1,53 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="fragments/loggedheader"> </head>
+
+<body>
+
+    <div class="activity-list">
+
+        <div class="button-group align-justify">
+            <a th:href="@{/me/activities(page=${page} - 1)}" class="button">Prev</a>
+            <a th:href="@{/me/activities(page=${page} + 1)}" class="button">Next</a>
+        </div>
+
+        <table>
+            <thead>
+                <tr> 
+                    <th>ID</th>
+                    <th>Date</th>
+                    <th>Name</th> 
+                    <th>Type</th> 
+                    <th>Gear</th>
+                    <th>Sport Type</th>
+                    <th>Commute?</th>
+                    <th>Trainer?</th>
+                    <th>Hidden?</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="activity : ${activities}">
+                    <td th:text="${activity.id}"></td>
+                    <td th:text="${activity.start_date}"></td>
+                    <td th:text="${activity.name}"></td>
+                    <td th:text="${activity.type}"></td>
+                    <td th:text="${activity.gear_id}"></td>
+                    <td th:text="${activity.sport_type}"></td>
+                    <td th:text="${activity.commute}"></td>
+                    <td th:text="${activity.trainer}"></td>
+                    <td th:text="${activity.hide_from_home}"></td>
+                    <td th:text="${activity.description}"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+
+
+    <div th:replace="fragments/footer"></div>
+
+</body>
+
+</html>

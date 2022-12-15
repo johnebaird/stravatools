@@ -17,6 +17,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.ui.Model;
 
 @Controller
+@SessionAttributes("athlete")
 public class SimpleController {
 
     @Autowired
@@ -40,30 +41,20 @@ public class SimpleController {
 
     private RestService strava = new RestService();
 
+    @ModelAttribute("athlete")
+    public Athlete athlete() {
+        return new Athlete();
+    }
+
     @PostConstruct
     public void init() {
         this.strava.setClientId(clientId);
         this.strava.setClientSecret(clientSecret);
-/*        try {
-            Bearer b = bearerRepository.findById(UUID.fromString("2af29c16-dc7c-435b-b78a-09ec380541d0")).get();
-            this.strava.setBearerToken(b);
-        }
-        catch (NoSuchElementException e) {
-            // this is fine
-        }
-*/
-    }
-
-    @RequestMapping(value = "/username", method = RequestMethod.GET)
-    @ResponseBody
-    public String currentUserName(Authentication authentication) {
-        return authentication.getName();
     }
 
     @GetMapping("/")
     public String homePage(Model model) {
         return "index";
-       
     }
 
     @GetMapping("/login")
@@ -97,7 +88,7 @@ public class SimpleController {
     }
 
     @GetMapping("/exchange_token")
-    public String exchangeToken(Authentication authentication, @RequestParam(name="code", required=false) String code, Model model) {
+    public String exchangeToken(Authentication authentication, @RequestParam(name="code", required=true) String code, Model model, @ModelAttribute("athlete") Athlete athlete) {
         
         strava.postForBearerToken(code);
                 
@@ -110,12 +101,13 @@ public class SimpleController {
         userRepository.save(currentUser);
         bearerRepository.save(token);
 
-        return "redirect:/me";
+        return "redirect:/me/activities";
     }
     
     @PostMapping("/setBikes")
     public String setDefaultBikes(Authentication authentication, @RequestParam(name="indoor", required=false) String indoor, 
-                                                                @RequestParam(name="outdoor", required=false) String outdoor, Model model) {
+                                                                @RequestParam(name="outdoor", required=false) String outdoor, Model model, 
+                                                                @ModelAttribute("athlete") Athlete athlete) {
 
         User currentUser = userRepository.findById(authentication.getName()).get();
         
@@ -124,27 +116,80 @@ public class SimpleController {
 
         userRepository.save(currentUser);
 
-        return "redirect:/me";
+        return "redirect:/me/defaultbikes";
     }
 
     @PostMapping("/changeAllIndoor")
     public String changeAllIndoor(Authentication authentication, @RequestParam(name="indoorstart", required=true) String indoorstart,
-                                                                @RequestParam(name="indoorend", required=true) String indoorend, Model model) {
+                                                                @RequestParam(name="indoorend", required=true) String indoorend, Model model, 
+                                                                @ModelAttribute("athlete") Athlete athlete) {
 
         User currentUser = userRepository.findById(authentication.getName()).get();
 
         long start = LocalDate.parse(indoorstart).atStartOfDay().toEpochSecond(ZoneOffset.UTC);
         long end = LocalDate.parse(indoorend).atStartOfDay().toEpochSecond(ZoneOffset.UTC);
 
-        int changed = strava.changeAllTrainerActivities(end, start, currentUser.getIndoorBike());
+        int changed = strava.changeAllIndoorActivities(end, start, currentUser.getIndoorBike());
 
         model.addAttribute("changedActivities", changed);
         
-        return "redirect:/me";                                                           
+        return "redirect:/me/defaultbikes";                                                           
+    }
+    
+    @GetMapping("/me/maintenance")
+    public String maintenance(Authentication authentication, Model model, @ModelAttribute("athlete") Athlete athlete) {
+        return "me/maintenance";
+
     }
 
-    @GetMapping("/me")
-    public String me(Authentication authentication, @RequestParam(name="page", required=false) Optional<Integer> page, Model model) {
+    @GetMapping("/me/muting")
+    public String muting(Authentication authentication, Model model, @ModelAttribute("athlete") Athlete athlete) {
+        return "me/muting";
+
+    }
+
+    @GetMapping("/me/defaultbikes")
+    public String defaultbikes(Authentication authentication, Model model, @ModelAttribute("athlete") Athlete athlete) {
+        
+        User currentUser = userRepository.findById(authentication.getName()).get();
+
+        if (currentUser.getBearerToken() == null) { return "redirect:/stravaauth"; }
+
+        Bearer currentBearer = bearerRepository.findById(currentUser.getBearerToken()).get();
+
+        strava.setBearerToken(currentBearer);
+        strava.refreshBearerToken();
+        bearerRepository.save(strava.getBearerToken());
+
+        System.out.println("Using access_token: " + strava.getBearerToken().getAccess_token());
+
+        Athlete me = strava.postforAthlete();
+        Bikes[] bikes = me.getBikes();
+
+        String defaultIndoor = "None";
+        String defaultOutdoor = "None";
+
+        for (Bikes b : bikes) {
+            if ( b.getId().equals(currentUser.getIndoorBike()) ) {
+                defaultIndoor = b.getName();
+            }
+            if ( b.getId().equals(currentUser.getOutdoorBike()) ) {
+                defaultOutdoor = b.getName();
+            }
+        }
+
+        model.addAttribute("athlete", me);
+        model.addAttribute("bikes", bikes);
+        model.addAttribute("defaultIndoor", defaultIndoor);
+        model.addAttribute("defaultOutdoor", defaultOutdoor);
+                        
+        return "me/defaultbikes";
+    }
+
+
+    @GetMapping("/me/activities")
+    public String activities(Authentication authentication, @RequestParam(name="page", required=false) Optional<Integer> page, Model model, 
+                                                            @ModelAttribute("athlete") Athlete athlete) {
         
         int currentPage = 1;
 
@@ -163,29 +208,14 @@ public class SimpleController {
         System.out.println("Using access_token: " + strava.getBearerToken().getAccess_token());
 
         Athlete me = strava.postforAthlete();
-        Bikes[] bikes = me.getBikes();
-        Activity[] activities = strava.getAtheleteActivities(0, 0, currentPage);
-
-        String defaultIndoor = "None";
-        String defaultOutdoor = "None";
-
-        for (Bikes b : bikes) {
-            if ( b.getId().equals(currentUser.getIndoorBike()) ) {
-                defaultIndoor = b.getName();
-            }
-            if ( b.getId().equals(currentUser.getOutdoorBike()) ) {
-                defaultOutdoor = b.getName();
-            }
-        }
+        Activity[] activities = strava.getAthleteActivities(currentPage);
 
         model.addAttribute("athlete", me);
-        model.addAttribute("bikes", bikes);
         model.addAttribute("activities", activities);
         model.addAttribute("page", currentPage);
-        model.addAttribute("defaultIndoor", defaultIndoor);
-        model.addAttribute("defaultOutdoor", defaultOutdoor);
+
                         
-        return "me";
+        return "me/activities";
     }
    
 }

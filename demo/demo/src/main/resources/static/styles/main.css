@@ -1,13 +1,51 @@
+.main {
+  background-image: url("/img/background.webp");
+  background-size:cover;
+  background-repeat: no-repeat;
+  background-color:slategrey;
+}
+
 body {
-  background-image: background;
-  background-color:cadetblue;
+  background-color:slategrey;
+
+}
+
+#logoimage {
+  height: 20em;
+  padding: 1em;
 }
 
 div.grid-container {
-  width: 300px;  
-  
+  width: 40em;  
+  background-color:aquamarine;
 }
 
-div.top-bar {
+div.grid-container div {
+  background:aquamarine;
+}
+
+
+.top-bar {
+  margin: 1em;
+  background: lightblue;
+}
+
+.top-bar .menu {
+  background-color: lightblue;
+}
+
+.input-group span {
+  width: 7em;
+}
+
+.top-bar-right li {
+  padding: 0em 0.5em;
+}
+
+.activity-list {
+  padding: 1em;
+}
+
+.callout {
   margin: 1em;
 }

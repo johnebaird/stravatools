@@ -1,0 +1,65 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="fragments/loggedheader"> </head>
+
+<body>
+    <div class="grid-x">    
+        <div class="cell auto">
+            <div class="callout primary">
+                <form th:action="@{/setBikes}" method="POST">
+                    <table class="bikes">
+                        <tr> 
+                            <th>ID</th>
+                            <th>Bike</th> 
+                            <th>Distance</th> 
+                            <th>Indoor Bike</th>
+                            <th>Outdoor Bike</th>
+                        </tr>
+                        <tr th:each="bike : ${bikes}"> 
+                            <td th:text="${bike.id}"></td>
+                            <td th:text="${bike.name}"></td>
+                            <td th:text="${bike.distance} / 1000 +  'k'"></td>
+                            <td><input type="radio" name="indoor" th:value="${bike.id}"></td>
+                            <td><input type="radio" name="outdoor" th:value="${bike.id}"></td>
+                        </tr>
+                    </table>
+                    <button class="submit button" type="submit">Apply</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="cell auto">
+            <div class="callout secondary changeindoor">
+                <h5><p> Change all indoor activities to <span th:text="${defaultIndoor}"></p></h5>
+                <form th:action="@{/changeAllIndoor}" method="POST">
+                    <p>From:</p> <input type="date" name="indoorstart">
+                    <p>To:</p> <input type="date" name="indoorend">
+                    <button class="submit button" type="submit">Apply</button>
+                </form>
+            </div>
+        </div>  
+
+        <div class="cell auto">
+            <div class="callout secondary changeoutdoor">
+                <h5><p>Change all outdoor activities to <span th:text="${defaultOutdoor}"></span></p></h5>
+                <form th:action="@{/changeAllOutdoor}" method="POST">
+                    <p>From:</p> <input type="date" name="outdoorstart">
+                    <p>To:</p> <input type="date" name="outdoorend">
+                    <button  class="submit button" type="submit">Apply</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <span th:if="${changedActivities}">
+        <p>changed <span th:text="${changedActivities}"> activities</span></p>
+    </span>
+
+    <br>
+
+    <div th:replace="fragments/footer"></div>
+
+</body>
+
+</html>

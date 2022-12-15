@@ -15,8 +15,10 @@ public class User implements Serializable {
     private String password;
 
     private String indoorBike;
+    private boolean autoChangeIndoorBike;
 
     private String outdoorBike;
+    private boolean autoChangeOutdoorBike;
 
     private boolean accountExpired;
     private boolean credentialsExpired;
@@ -34,7 +36,26 @@ public class User implements Serializable {
         this.credentialsExpired = false;
         this.accountLocked = false;
 
+        this.autoChangeIndoorBike = false;
+        this.autoChangeOutdoorBike = false;
+
         this.role = "USER";
+    }
+
+    public boolean isAutoChangeIndoorBike() {
+        return autoChangeIndoorBike;
+    }
+
+    public void setAutoChangeIndoorBike(boolean changeIndoorBike) {
+        this.autoChangeIndoorBike = changeIndoorBike;
+    }
+
+    public boolean isAutoChangeOutdoorBike() {
+        return autoChangeOutdoorBike;
+    }
+
+    public void setAutoChangeOutdoorBike(boolean changeOutdoorBike) {
+        this.autoChangeOutdoorBike = changeOutdoorBike;
     }
 
     public UUID getBearerToken() {

@@ -44,6 +44,14 @@ public class RestService {
         this.restTemplate = new RestTemplate();
     }
 
+    private URIBuilder getStravaURI(String path) {
+        URIBuilder builder = new URIBuilder()
+                                .setScheme("https")
+                                .setHost("www.strava.com")
+                                .setPath("/api/v3/" + path);
+        return builder;
+    }
+
     public Athlete postforAthlete() {
 
         String url = "https://www.strava.com/api/v3/athlete/";
@@ -68,10 +76,7 @@ public class RestService {
 
     }
 
-    public String changeBikeForActivity(long activity, String bike) {
-
-        String url = String.format("https://www.strava.com/api/v3/activities/%d", activity);
-        String body = String.format("{\"gear_id\": \"%s\"}", bike);
+    private String putToStravaAPI(URI url, String body) {
         
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -82,18 +87,36 @@ public class RestService {
         ResponseEntity<String> response = this.restTemplate.exchange(url, HttpMethod.PUT, request, String.class);
         
         if (response.getStatusCode() == HttpStatus.OK) {
-            System.out.println("Successfully changed bike for " + activity);
+            System.out.println("Successful PUT");
             return response.getBody();
         }
         else {
-            System.out.println("Error changing bike for" + activity + " - error:" + response.getStatusCode() + " " + response.getBody());
+            System.out.println("Error on PUT request" + response.getStatusCode() + " " + response.getBody());
             return null;
             
         }
-
     }
 
-    public int changeAllTrainerActivities(long before, long after, String bike) {
+    public String changeBikeForActivity(long activity, String bike) {
+
+        URIBuilder builder = getStravaURI("activities/");
+        builder.appendPath(Long.toString(activity));
+
+        String body = String.format("{\"gear_id\": \"%s\"}", bike);
+        
+        try {
+            URI uri = builder.build();
+            return putToStravaAPI(uri, body);
+        }
+        catch (URISyntaxException u) {
+            u.printStackTrace();
+            return null;
+        }
+    }
+
+
+
+    public int changeAllIndoorActivities(long before, long after, String bike) {
         
         Activity[] activities;
         int page = 1;
@@ -103,22 +126,10 @@ public class RestService {
             
             System.out.println("Bike change querying page: " + page);
 
-            activities = this.getAtheleteActivities(before, after, page);
+            activities = this.getAthleteActivities(before, after, page);
             try { Thread.sleep(100L); } catch (InterruptedException e) {e.printStackTrace();}
 
-            for(Activity a: activities) {
-
-                if (a.isTrainer() && (a.getSport_type().equals("Ride") || a.getSport_type().equals("VirtualRide"))) {
-                    
-                    System.out.println("Found cadidate to change: " + a.getId() + " " + a.getName());
-                    
-                    if (!a.getGear_id().equals(bike)) {
-                        this.changeBikeForActivity(a.getId(), bike);
-                        try { Thread.sleep(100L); } catch (InterruptedException e) {e.printStackTrace();}
-                        changedActivities += 1;
-                    }
-                }
-            }
+            changedActivities += changeIndoorCurrentPage(bike, activities);
 
             page += 1;
 
@@ -132,46 +143,100 @@ public class RestService {
         return changedActivities;
     }
 
-    public Activity[] getAtheleteActivities(long before, long after, int page) {
+    public int changeIndoorCurrentPage(String bike, Activity[] activities) {
+        int changedActivities = 0;
+        for(Activity a: activities) {
 
-        URI uri;
+            if (a.isTrainer() && (a.getSport_type().equals("Ride") || a.getSport_type().equals("VirtualRide"))) {
+                
+                System.out.println("Found cadidate to change: " + a.getId() + " " + a.getName());
+                
+                if (!a.getGear_id().equals(bike)) {
+                    this.changeBikeForActivity(a.getId(), bike);
+                    try { Thread.sleep(100L); } catch (InterruptedException e) {e.printStackTrace();}
+                    changedActivities += 1;
+                }
+            }
+        }
+        return changedActivities;
+    }
 
-        URIBuilder builder = new URIBuilder()
-                                .setScheme("https")
-                                .setHost("www.strava.com")
-                                .setPath("/api/v3/activities/");
+    public Activity[] getAthleteActivities(long before, long after, int page) {
+
+        URIBuilder builder = getStravaURI("activities/");
         
-        if (before > 0 ) { builder.setParameter("before", Long.toString(before));}
-        if (after > 0 ) { builder.setParameter("after", Long.toString(after));}       
+        builder.setParameter("before", Long.toString(before));
+        builder.setParameter("after", Long.toString(after)); 
         builder.setParameter("page", Integer.toString(page));
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("Authorization", "Bearer " + this.bearerToken.getAccess_token());
-
-        HttpEntity<String> entity = new HttpEntity<>(headers);
-        
         try {
 
-            uri = builder.build();
-            ResponseEntity<Activity[]> response = this.restTemplate.exchange(uri, HttpMethod.GET, entity, Activity[].class);
+            URI uri = builder.build();
+            return apiQueryActivities(uri);
+        }
+        
+        catch (URISyntaxException u) {
+            u.printStackTrace();
+            return null;
+        }
 
-    
-            if (response.getStatusCode() == HttpStatus.OK) {
-                System.out.println("Successfully got activities");
-                return response.getBody();
-            }
-            else {
-                System.out.println("Error getting Activities" + response.getStatusCode() + " " + response.getBody());
-                return null;
-                
-            }
+    }
+
+
+
+    public Activity[] getAthleteActivities(int page) {
+
+        URIBuilder builder = getStravaURI("activities/");
+        
+        builder.setParameter("page", Integer.toString(page));
+
+        try {
+            URI uri = builder.build();
+            return apiQueryActivities(uri);
+        }
+        
+        catch (URISyntaxException u) {
+            u.printStackTrace();
+            return null;
+        }
+    }
+
+    public Activity[] getAthleteActivities() {
+
+        URIBuilder builder = getStravaURI("activities/");
+        
+        try {
+            URI uri = builder.build();
+            return apiQueryActivities(uri);
         }
         catch (URISyntaxException u) {
             u.printStackTrace();
             return null;
         }
 
+    }
+
+    
+    private Activity[] apiQueryActivities(URI uri) {
+        
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("Authorization", "Bearer " + this.bearerToken.getAccess_token());
+
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+
+        ResponseEntity<Activity[]> response = this.restTemplate.exchange(uri, HttpMethod.GET, entity, Activity[].class);
+
+   
+        if (response.getStatusCode() == HttpStatus.OK) {
+            System.out.println("Successfully got activities");
+            return response.getBody();
+        }
+        else {
+            System.out.println("Error getting Activities" + response.getStatusCode() + " " + response.getBody());
+            return null;
+            
+        }
     }
 
     public void refreshBearerToken() {
@@ -181,35 +246,45 @@ public class RestService {
             return;
         }
 
-        String url = "https://www.strava.com/oauth/token";
-
-        url += "?client_id=" + this.clientId;
-        url += "&client_secret=" + this.clientSecret;
-        url += "&grant_type=refresh_token";
-        url += "&refresh_token=" + (String)bearerToken.getRefresh_token();
+        URIBuilder builder = this.getStravaURI("/oauth/token");
         
-        ResponseEntity<Bearer> response = this.restTemplate.postForEntity(url, null, Bearer.class);
+        builder.addParameter("client_id", this.clientId);
+        builder.addParameter("client_secret", this.clientSecret);
+        builder.addParameter("grant_type", "refresh_token");
+        builder.addParameter("refresh_token", (String)bearerToken.getRefresh_token());
 
-        if (response.getStatusCode() == HttpStatus.OK) {
-            System.out.println("Successfully refreshed Bearer Token: " + response.getBody().getAccess_token());
-            this.bearerToken = response.getBody();
+        try {
+            URI uri = builder.build();
+            postForBearer(uri);
         }
-        else {
-            System.out.println("Error refreshing Bearer Token" + response.getStatusCode() + " " + response.getBody());
-            
+        catch (URISyntaxException u) {
+            u.printStackTrace();
         }
 
     }
 
     public void postForBearerToken(String exchange) { 
 
-        String url = "https://www.strava.com/oauth/token";
+        URIBuilder builder = this.getStravaURI("/oauth/token");
+        
+        builder.addParameter("client_id", this.clientId);
+        builder.addParameter("client_secret", this.clientSecret);
+        builder.addParameter("grant_type", "autorization_code");
+        builder.addParameter("code", exchange);
 
-        url += "?client_id=" + this.clientId;
-        url += "&client_secret=" + this.clientSecret;
-        url += "&code=" + exchange;
-        url += "&grant_type=authorization_code";
+        try {
+            URI uri = builder.build();
+            postForBearer(uri);
+        }
+        catch (URISyntaxException u) {
+            u.printStackTrace();
+        }
 
+        
+        
+    }
+
+    private void postForBearer(URI url) {
         ResponseEntity<Bearer> response = this.restTemplate.postForEntity(url, null, Bearer.class);
 
         if (response.getStatusCode() == HttpStatus.OK) {

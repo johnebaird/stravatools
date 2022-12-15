@@ -13,6 +13,7 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
+
 public class SecurityConfig {
 
 	@Autowired
@@ -23,12 +24,12 @@ public class SecurityConfig {
 
 		http
 			.authorizeRequests()
-				.antMatchers("/", "/index", "/login","/register", "/img/*", "/styles/*").permitAll()	
+				.antMatchers("/", "/index", "/login", "/img/*", "/styles/*").permitAll()	
 				.anyRequest().authenticated()
 				.and()
             .formLogin()
 				.loginPage("/login")
-				.defaultSuccessUrl("/me", true)
+				.defaultSuccessUrl("/me/activities", true)
 				.permitAll()
 				.and()
 			.logout();
