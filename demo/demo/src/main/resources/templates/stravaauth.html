@@ -1,10 +1,21 @@
 <html>
     <head th:replace="fragments/header"> </head>
 <body>
-<h1>Link Strava account:</h1>
-<p>
-    <a href="https://www.strava.com/oauth/authorize?client_id=96771&response_type=code&redirect_uri=http://localhost:8080/exchange_token&scope=activity:read_all,activity:write,profile:read_all">Autorize Strava</a>
-</p>
+
+    <div class="grid-container" >
+        <div class="grid-x grid-margin-x">
+            <div class="card">
+                <div class="card-divider">
+                <b>Click link to redirect and link Strava account</b>
+                </div>
+                <img id="logoimage" th:src="@{/img/bicycle01.png}" />
+                <div class="card-section">
+                    <p> <a href="https://www.strava.com/oauth/authorize?client_id=96771&response_type=code&redirect_uri=http://localhost:8080/exchange_token&scope=activity:read_all,activity:write,profile:read_all">Autorize Strava</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
 <div th:replace="fragments/footer"></div>
 </body>
 </html>

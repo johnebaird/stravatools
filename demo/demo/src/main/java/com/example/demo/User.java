@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import org.springframework.data.cassandra.core.mapping.PrimaryKey;
 import org.springframework.data.cassandra.core.mapping.Table;
+import org.springframework.data.annotation.Transient;
 
 @Table
 public class User implements Serializable {
@@ -26,7 +27,14 @@ public class User implements Serializable {
 
     private String role;
 
-    private UUID bearerToken;
+    private UUID bearerUUID;
+
+    @Transient
+    private Athlete athlete;
+
+
+    public User() {
+    }
 
     public User(String username, String password) {
         this.username = username;
@@ -40,6 +48,18 @@ public class User implements Serializable {
         this.autoChangeOutdoorBike = false;
 
         this.role = "USER";
+    }
+
+    public boolean hasAutoTasks() {
+        return autoChangeIndoorBike || autoChangeOutdoorBike;
+    }
+
+    public Athlete getAthlete() {
+        return athlete;
+    }
+
+    public void setAthlete(Athlete athlete) {
+        this.athlete = athlete;
     }
 
     public boolean isAutoChangeIndoorBike() {
@@ -58,12 +78,12 @@ public class User implements Serializable {
         this.autoChangeOutdoorBike = changeOutdoorBike;
     }
 
-    public UUID getBearerToken() {
-        return bearerToken;
+    public UUID getBearerUUID() {
+        return bearerUUID;
     }
 
-    public void setBearerToken(UUID bearerToken) {
-        this.bearerToken = bearerToken;
+    public void setBearerUUID(UUID bearerUUID) {
+        this.bearerUUID = bearerUUID;
     }
 
     public String getUsername() {

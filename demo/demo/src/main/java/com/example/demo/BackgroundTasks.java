@@ -2,6 +2,8 @@ package com.example.demo;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
@@ -18,6 +20,8 @@ public class BackgroundTasks {
     @Autowired
     private UserRepository userRepository;
 
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
+
     @Value("${spring.stravatools.client_id}")
     private String clientId;
     
@@ -27,10 +31,10 @@ public class BackgroundTasks {
     private RestService strava = new RestService();
 
     // run at the top of the hour every hour
-    @Scheduled(cron = "0 * * * *")
+    @Scheduled(cron = "0 0 * * * ?")
     public void correctBikes() { 
 
-        System.out.println("Running bike correction task");
+        logger.info("Running bike correction task");
 
         this.strava.setClientId(clientId);
         this.strava.setClientSecret(clientSecret);
@@ -39,30 +43,34 @@ public class BackgroundTasks {
         
         for (User user : userList) {
 
+            logger.debug("background task running for user: " + user.getUsername());
+            
             // check if we need to change anything for user
-            if (user.isAutoChangeIndoorBike() || user.isAutoChangeOutdoorBike()) {
+            if (user.hasAutoTasks()) {
                             
-                if (user.getBearerToken() == null) { break; }
+                if (user.getBearerUUID() == null) { break; }
 
-                Bearer currentBearer = bearerRepository.findById(user.getBearerToken()).get();
+                logger.debug("getting bearer token for " + user.getUsername());
+                Bearer currentBearer = bearerRepository.findById(user.getBearerUUID()).get();
         
                 strava.setBearerToken(currentBearer);
                 strava.refreshBearerToken();
                 bearerRepository.save(strava.getBearerToken());
-            }
+            
+                if (user.isAutoChangeIndoorBike()) {
+                    Activity[] activities = strava.getAthleteActivities();
+                    logger.debug("changing indoor bikes for " + user.getUsername());
+                    strava.changeIndoorCurrentPage(user.getIndoorBike(), activities);
+                }
 
-            if (user.isAutoChangeIndoorBike()) {
-                Activity[] activities = strava.getAthleteActivities();
-                strava.changeIndoorCurrentPage(user.getIndoorBike(), activities);
-            }
-
-            if (user.isAutoChangeOutdoorBike()) {
-                Activity[] activities = strava.getAthleteActivities();
-                strava.changeOutdoorCurrentPage(user.getOutdoorBike(), activities);
+                if (user.isAutoChangeOutdoorBike()) {
+                    Activity[] activities = strava.getAthleteActivities();
+                    logger.debug("changing outdoor bikes for " + user.getUsername());
+                    strava.changeOutdoorCurrentPage(user.getOutdoorBike(), activities);
+                }
             }
         }
-        
-        
+     
 
     }
 }

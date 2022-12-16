@@ -6,18 +6,18 @@
     <div class="grid-x grid-margin-x">
         <div class="card">
             <div class="card-divider">
-            Register to link Strava account and access tools
+            <b>Register to link Strava account and access tools</b>
             </div>
             <img id="logoimage" th:src="@{/img/bicycle01.png}" />
             <div class="card-section">
                 <form th:action="@{/register}" method="POST">
                     <div class="input-group">
-                        <span class="input-group-label">Email: </span>
+                        <span class="input-group-label">Email:</span>
                         <input class="input-group-field" name="username" type="text">
                     </div>
                     <div class="input-group">
-                        <span class="input-group-label">Password: </span>
-                        <input class="input-group-field" name="password1" type="password">
+                        <span class="input-group-label">Password:</span>
+                        <input class="input-group-field" name="password" type="password">
                     </div>
 
                     <td><button class="submit button">Register</button></td>

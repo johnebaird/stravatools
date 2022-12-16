@@ -7,6 +7,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.Instant;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.apache.hc.core5.net.URIBuilder;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -23,6 +25,8 @@ public class RestService {
     private String clientSecret;
     private String clientId;
     private Bearer bearerToken;
+
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     public Bearer getBearerToken() {
         return bearerToken;
@@ -65,11 +69,11 @@ public class RestService {
         ResponseEntity<Athlete> response = this.restTemplate.exchange(url, HttpMethod.GET, request, Athlete.class);
         
         if (response.getStatusCode() == HttpStatus.OK) {
-            System.out.println("Successfully got athelete info");
+            logger.info("Successfully got athelete info");
             return response.getBody();
         }
         else {
-            System.out.println("Error getting Athlete" + response.getStatusCode() + " " + response.getBody());
+            logger.info("Error getting Athlete" + response.getStatusCode() + " " + response.getBody());
             return null;
             
         }
@@ -87,11 +91,11 @@ public class RestService {
         ResponseEntity<String> response = this.restTemplate.exchange(url, HttpMethod.PUT, request, String.class);
         
         if (response.getStatusCode() == HttpStatus.OK) {
-            System.out.println("Successful PUT");
+            logger.info("Successful PUT");
             return response.getBody();
         }
         else {
-            System.out.println("Error on PUT request" + response.getStatusCode() + " " + response.getBody());
+            logger.info("Error on PUT request" + response.getStatusCode() + " " + response.getBody());
             return null;
             
         }
@@ -124,7 +128,7 @@ public class RestService {
 
         while(true) {
             
-            System.out.println("Bike change querying page: " + page);
+            logger.info("Bike change querying page: " + page);
 
             activities = this.getAthleteActivities(before, after, page);
             try { Thread.sleep(100L); } catch (InterruptedException e) {e.printStackTrace();}
@@ -138,7 +142,7 @@ public class RestService {
 
             page += 1;
 
-            System.out.println("page " + page);
+            logger.info("page " + page);
 
             if (activities.length < 25) { break; }
             if (page > 50) {break; }
@@ -154,7 +158,7 @@ public class RestService {
 
             if (a.isTrainer() && (a.getSport_type().equals("Ride") || a.getSport_type().equals("VirtualRide"))) {
                 
-                System.out.println("Found indoor cadidate to change: " + a.getId() + " " + a.getName());
+                logger.info("Found indoor cadidate to change: " + a.getId() + " " + a.getName());
                 
                 if (!a.getGear_id().equals(bike)) {
                     this.changeBikeForActivity(a.getId(), bike);
@@ -172,7 +176,7 @@ public class RestService {
 
             if (!a.isTrainer() && (a.getSport_type().equals("Ride") || a.getSport_type().equals("VirtualRide"))) {
                 
-                System.out.println("Found outdoor cadidate to change: " + a.getId() + " " + a.getName());
+                logger.info("Found outdoor cadidate to change: " + a.getId() + " " + a.getName());
                 
                 if (!a.getGear_id().equals(bike)) {
                     this.changeBikeForActivity(a.getId(), bike);
@@ -253,11 +257,11 @@ public class RestService {
 
    
         if (response.getStatusCode() == HttpStatus.OK) {
-            System.out.println("Successfully got activities");
+            logger.info("Successfully got activities");
             return response.getBody();
         }
         else {
-            System.out.println("Error getting Activities" + response.getStatusCode() + " " + response.getBody());
+            logger.info("Error getting Activities" + response.getStatusCode() + " " + response.getBody());
             return null;
             
         }
@@ -266,7 +270,7 @@ public class RestService {
     public void refreshBearerToken() {
 
         if ((Instant.now().getEpochSecond() + 60) < bearerToken.getExpires_at()) {
-            System.out.println("Bearer token still valid");
+            logger.info("Bearer token still valid");
             return;
         }
 
@@ -312,11 +316,11 @@ public class RestService {
         ResponseEntity<Bearer> response = this.restTemplate.postForEntity(url, null, Bearer.class);
 
         if (response.getStatusCode() == HttpStatus.OK) {
-            System.out.println("Successfully got Bearer Token: " + response.getBody().getAccess_token());
+            logger.info("Successfully got Bearer Token: " + response.getBody().getAccess_token());
             this.bearerToken = response.getBody();
         }
         else {
-            System.out.println("Error getting Bearer Token" + response.getStatusCode() + " " + response.getBody());
+            logger.info("Error getting Bearer Token" + response.getStatusCode() + " " + response.getBody());
             
         }
     }
