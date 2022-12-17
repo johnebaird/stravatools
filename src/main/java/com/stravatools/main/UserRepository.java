@@ -1,4 +1,4 @@
-package com.example.demo;
+package com.stravatools.main;
 
 import org.springframework.data.cassandra.repository.CassandraRepository;
 import org.springframework.stereotype.Repository;

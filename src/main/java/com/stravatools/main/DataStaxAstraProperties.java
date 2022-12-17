@@ -1,4 +1,4 @@
-package com.example.demo;
+package com.stravatools.main;
 
 import java.io.File;
 import org.springframework.boot.context.properties.ConfigurationProperties;

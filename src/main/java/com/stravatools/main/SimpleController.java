@@ -1,4 +1,4 @@
-package com.example.demo;
+package com.stravatools.main;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -7,8 +7,6 @@ import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.util.Optional;
 import java.util.UUID;
-
-import javax.annotation.PostConstruct;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,7 +64,7 @@ public class SimpleController {
     public String authToStrava(Model model) {
         return "stravaauth";
     }
-/*
+
     @PostMapping("/register")
     public String createUser(@RequestParam(name="username", required=true) String username, @RequestParam(name="password", required=true) String password, Model model) {
 
@@ -75,7 +73,8 @@ public class SimpleController {
         if (userRepository.existsById(username)) {
             System.out.println("request to create existing user: " + username);
             return "redirect:/login?error=userExists";
-            
+        }
+        
         else {
             System.out.println("creating new user with username: " + username + " and pass: " + password);
             User u = new User(username, passwordEncoder.encode(password));
@@ -85,7 +84,7 @@ public class SimpleController {
         }
         
     }
- */
+
     @GetMapping("/exchange_token")
     public String exchangeToken(Authentication authentication, @RequestParam(name="code", required=true) String code, Model model, 
                                     @ModelAttribute("user") User user, @ModelAttribute("strava") RestService strava) {

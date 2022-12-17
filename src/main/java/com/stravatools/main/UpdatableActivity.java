@@ -1,4 +1,4 @@
-package com.example.demo;
+package com.stravatools.main;
 
 public class UpdatableActivity {
 

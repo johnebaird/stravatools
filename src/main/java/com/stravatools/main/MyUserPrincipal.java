@@ -1,4 +1,4 @@
-package com.example.demo;
+package com.stravatools.main;
 
 import java.util.Collection;
 import java.util.HashSet;

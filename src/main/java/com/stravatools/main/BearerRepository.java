@@ -1,4 +1,4 @@
-package com.example.demo;
+package com.stravatools.main;
 import java.util.UUID;
 
 import org.springframework.data.cassandra.repository.CassandraRepository;

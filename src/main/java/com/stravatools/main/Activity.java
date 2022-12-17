@@ -1,4 +1,4 @@
-package com.example.demo;
+package com.stravatools.main;
 
 import java.io.Serializable;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;

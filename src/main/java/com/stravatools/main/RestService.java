@@ -1,4 +1,4 @@
-package com.example.demo;
+package com.stravatools.main;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
