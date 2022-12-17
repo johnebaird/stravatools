@@ -66,7 +66,7 @@ public class SimpleController {
     public String authToStrava(Model model) {
         return "stravaauth";
     }
-
+/*
     @PostMapping("/register")
     public String createUser(@RequestParam(name="username", required=true) String username, @RequestParam(name="password", required=true) String password, Model model) {
 
@@ -85,7 +85,7 @@ public class SimpleController {
         }
         
     }
-
+ */
     @GetMapping("/exchange_token")
     public String exchangeToken(Authentication authentication, @RequestParam(name="code", required=true) String code, Model model, 
                                     @ModelAttribute("user") User user, @ModelAttribute("strava") RestService strava) {
