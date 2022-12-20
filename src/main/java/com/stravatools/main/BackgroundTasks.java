@@ -13,6 +13,8 @@ import org.springframework.scheduling.annotation.Scheduled;
 @Configuration
 @EnableScheduling
 public class BackgroundTasks { 
+// run background tasks at top of the hour for intermittent functions like
+// correcting indoor and outdoor bikes and muting activities
 
     @Autowired
 	private BearerRepository bearerRepository;

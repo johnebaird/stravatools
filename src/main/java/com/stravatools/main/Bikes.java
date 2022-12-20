@@ -7,6 +7,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @JsonIgnoreProperties(ignoreUnknown=true)
 
 public class Bikes implements Serializable {
+// Class matching data returned from Strava API for 'Gear' (shoes/bikes)
+// only using Bikes for our porposes
 
     private String id;
     private boolean primary;

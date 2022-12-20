@@ -3,8 +3,10 @@ package com.stravatools.main;
 import java.io.Serializable;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+
 @JsonIgnoreProperties(ignoreUnknown=true)
 public class Activity implements Serializable {
+// Class matching data returned from Strava API for activities
 
     private long id;
     private String name;

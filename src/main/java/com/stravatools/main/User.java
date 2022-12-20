@@ -10,6 +10,9 @@ import org.springframework.data.annotation.Transient;
 @Table
 public class User implements Serializable {
 
+    // User class saves details of logged in user from an app standpoint
+    // Athelte is the user details we get querying that User to Strava
+
     @PrimaryKey 
     private String username;
 

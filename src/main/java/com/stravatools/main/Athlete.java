@@ -6,6 +6,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @JsonIgnoreProperties(ignoreUnknown=true)
 
 public class Athlete implements Serializable {
+// Class matching data returned from Strava API for Athelete
+// more data is returned than what is here but can be included later if needed
 
     private String id;
     private String username;

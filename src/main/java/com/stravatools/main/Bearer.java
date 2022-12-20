@@ -14,6 +14,7 @@ import java.util.UUID;
 
 @Table
 public class Bearer implements Serializable {
+// class to save bearer token used to authenticate to Strava API
 
     @PrimaryKey 
     @CassandraType(type = Name.UUID)

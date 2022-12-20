@@ -40,6 +40,7 @@ public class SimpleController {
     @Value("${spring.stravatools.client_secret}")
     private String clientSecret;
 
+    // user and strava interface is saved for session so we only need to look it up once
     @ModelAttribute("user")
     public User user() {
         return new User();
@@ -67,7 +68,8 @@ public class SimpleController {
 
     @PostMapping("/register")
     public String createUser(@RequestParam(name="username", required=true) String username, @RequestParam(name="password", required=true) String password, Model model) {
-
+        
+        // create a new user
         System.out.println("running createregisteruser");
 
         if (userRepository.existsById(username)) {
@@ -89,6 +91,7 @@ public class SimpleController {
     public String exchangeToken(Authentication authentication, @RequestParam(name="code", required=true) String code, Model model, 
                                     @ModelAttribute("user") User user, @ModelAttribute("strava") RestService strava) {
         
+        // called by strava to save our token for Strava oauth
         strava.setClientId(clientId);
         strava.setClientSecret(clientSecret);
         
@@ -111,16 +114,26 @@ public class SimpleController {
     
     @PostMapping("/setBikes")
     public String setDefaultBikes(Authentication authentication, @RequestParam(name="indoor", required=false) String indoor, 
-                                                                @RequestParam(name="outdoor", required=false) String outdoor, Model model, 
+                                                                @RequestParam(name="outdoor", required=false) String outdoor, 
+                                                                @RequestParam(name="indoorAutoSwitch", required=false) String indoorAutoSwitch,
+                                                                @RequestParam(name="outdoorAutoSwitch", required=false) String outdoorAutoSwitch, Model model, 
                                                                 @ModelAttribute("user") User user, @ModelAttribute("strava") RestService strava) {
 
+        // set default indoor or outdour bike for user
+        logger.debug(String.format("/setBikes called with parameters: indoor: %s, outdoor: %s, indoorAutoSwitch: %s, outdoorAutoSwitch: %s", 
+                                    indoor, outdoor, indoorAutoSwitch, outdoorAutoSwitch));
+                
+        if (indoor != null) {user.setIndoorBike(indoor);}
+        if (outdoor != null) {user.setOutdoorBike(outdoor);}
 
-        
-        user.setIndoorBike(indoor);
-        user.setOutdoorBike(outdoor);
+        if (indoorAutoSwitch != null) {user.setAutoChangeIndoorBike(true);}
+        else {user.setAutoChangeIndoorBike(false);}
+
+        if (outdoorAutoSwitch != null) {user.setAutoChangeOutdoorBike(true);}
+        else {user.setAutoChangeOutdoorBike(false);}
 
         userRepository.save(user);
-
+        
         return "redirect:/me/defaultbikes";
     }
 
@@ -129,7 +142,7 @@ public class SimpleController {
                                                                 @RequestParam(name="end", required=true) String end, Model model, 
                                                                 @ModelAttribute("user") User user, @ModelAttribute("strava") RestService strava) {
 
-
+        // run task to change all indoor bikes for date range                                                            
         long epocStart = LocalDate.parse(start).atStartOfDay().toEpochSecond(ZoneOffset.UTC);
         long epocEnd = LocalDate.parse(end).atStartOfDay().toEpochSecond(ZoneOffset.UTC);
 
@@ -144,7 +157,7 @@ public class SimpleController {
     public String changeAllOutdoor(Authentication authentication, @RequestParam(name="start", required=true) String start,
                                                                 @RequestParam(name="end", required=true) String end, Model model, 
                                                                 @ModelAttribute("user") User user, @ModelAttribute("strava") RestService strava) {
-
+        // run task to change all outdoor bikes for date range                                                            
         if (user == null) { 
             user = loadUser(authentication, model, user);
             if (user.getBearerUUID() == null) {
@@ -180,6 +193,7 @@ public class SimpleController {
     @GetMapping("/me/defaultbikes")
     public String defaultbikes(Authentication authentication, Model model, @ModelAttribute("user") User user, @ModelAttribute("strava") RestService strava) {
         
+        // show page to let user pick options relating to setting default bikes and changing activities
         if (user == null) { 
             user = loadUser(authentication, model, user);
             if (user.getBearerUUID() == null) {
@@ -190,26 +204,30 @@ public class SimpleController {
             }
         }
         
-        logger.info("Using access_token: " + strava.getBearerToken().getAccess_token());
+        logger.debug("Using access_token: " + strava.getBearerToken().getAccess_token());
 
         Bikes[] bikes = user.getAthlete().getBikes();
 
-        String defaultIndoor = "None";
-        String defaultOutdoor = "None";
+        String indoorBikeName = "None";
+        String outdoorBikeName = "None";
 
         for (Bikes b : bikes) {
             if ( b.getId().equals(user.getIndoorBike()) ) {
-                defaultIndoor = b.getName();
+                indoorBikeName = b.getName();
             }
             if ( b.getId().equals(user.getOutdoorBike()) ) {
-                defaultOutdoor = b.getName();
+                outdoorBikeName = b.getName();
             }
         }
 
         model.addAttribute("athlete", user.getAthlete());
         model.addAttribute("bikes", bikes);
-        model.addAttribute("defaultIndoor", defaultIndoor);
-        model.addAttribute("defaultOutdoor", defaultOutdoor);
+        model.addAttribute("indoorBikeName", indoorBikeName);
+        model.addAttribute("outdoorBikeName", outdoorBikeName);
+        model.addAttribute("indoorBikeId", user.getIndoorBike());
+        model.addAttribute("outdoorBikeId", user.getOutdoorBike());
+        model.addAttribute("autoChangeIndoor", user.isAutoChangeIndoorBike());
+        model.addAttribute("autoChangeOutdoor", user.isAutoChangeOutdoorBike());
                         
         return "me/defaultbikes";
     }
@@ -220,6 +238,7 @@ public class SimpleController {
                                                             @ModelAttribute("user") User user, 
                                                             @ModelAttribute("strava") RestService strava) {
         
+        // returns page that shows pages of activities
         logger.debug("activities called with user: " + user.getUsername() + " " + user.getBearerUUID());
         logger.debug("activities called with strava: " + strava.toString());
 
@@ -240,7 +259,7 @@ public class SimpleController {
         int currentPage = 1;
         if (page.isPresent()) { currentPage = page.get(); }
         
-        logger.info("Using access_token: " + strava.getBearerToken().getAccess_token());
+        logger.debug("Using access_token: " + strava.getBearerToken().getAccess_token());
         
         Activity[] activities = strava.getAthleteActivities(currentPage);
         
@@ -252,6 +271,7 @@ public class SimpleController {
     }
 
     private User loadUser(Authentication authentication, Model model, User user) {
+        // takes details from auth object and load user data from db as an attribute
 
         user = userRepository.findById(authentication.getName()).get();
 
@@ -266,6 +286,7 @@ public class SimpleController {
 
 
     private RestService loadBearer(User user, RestService strava, Model model) {
+        // called after load user to load user's bearer token into an attribute        
 
         strava.setClientId(clientId);
         strava.setClientSecret(clientSecret);

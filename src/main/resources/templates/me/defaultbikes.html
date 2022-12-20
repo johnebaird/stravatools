@@ -10,28 +10,58 @@
                 <form th:action="@{/setBikes}" method="POST">
                     <table class="bikes">
                         <tr> 
-                            <th>ID</th>
                             <th>Bike</th> 
-                            <th>Distance</th> 
-                            <th>Indoor Bike</th>
-                            <th>Outdoor Bike</th>
+                            <th>Distance (k)</th> 
+                            <th>Default bike for</th> 
+                            <th>Set as Indoor</th>
+                            <th>Set as Outdoor</th>
                         </tr>
                         <tr th:each="bike : ${bikes}"> 
-                            <td th:text="${bike.id}"></td>
                             <td th:text="${bike.name}"></td>
-                            <td th:text="${bike.distance} / 1000 +  'k'"></td>
+                            <td th:text="${#numbers.formatDecimal(bike.distance / 1000, 0, 0)}"></td>
+                            <td th:if="${bike.id} == ${indoorBikeId}"><span class="label primary">Indoor</span></td>
+                            <td th:if="${bike.id} == ${outdoorBikeId}"><span class="label success">Outdoor</span></td>
+                            <td th:if="${bike.id} != ${indoorBikeId} and ${bike.id} != ${outdoorBikeId}"></td>
                             <td><input type="radio" name="indoor" th:value="${bike.id}"></td>
                             <td><input type="radio" name="outdoor" th:value="${bike.id}"></td>
                         </tr>
                     </table>
+
+                    <table>
+                        <tr>
+                            <td><span>Change indoor activities going forward:</span></td>
+                            <td>
+                                <div class="switch">
+                                    <input th:if="${autoChangeIndoor}" class="switch-input" id="indoorAutoSwitch" type="checkbox" checked="checked" name="indoorAutoSwitch">
+                                    <input th:unless="${autoChangeIndoor}" class="switch-input" id="indoorAutoSwitch" type="checkbox" name="indoorAutoSwitch">
+                                    <label class="switch-paddle" for="indoorAutoSwitch">
+                                    </label>
+                                </div>
+                            </tr>
+                        </tr>
+                        <tr>
+                            <td><span>Change outdoor activities going forward:</span></td>
+                            <td>
+                                <div class="switch">
+                                    <input th:if="${autoChangeOutdoor}" class="switch-input" id="outdoorAutoSwitch" type="checkbox" checked name="outdoorAutoSwitch">
+                                    <input th:unless="${autoChangeOutdoor}" class="switch-input" id="outdoorAutoSwitch" type="checkbox" name="outdoorAutoSwitch">
+                                    <label class="switch-paddle" for="outdoorAutoSwitch">
+                                    </label>
+                                </div>
+                            </td>   
+                        </tr>
+                    </table>
+                      
+                      
                     <button class="submit button" type="submit">Apply</button>
                 </form>
             </div>
+            
         </div>
 
         <div class="cell auto">
             <div class="callout secondary changeindoor">
-                <h5><p> Change all indoor activities to <span th:text="${defaultIndoor}"></p></h5>
+                <h5><p> Change indoor activities for date range to:  <span th:text="${indoorBikeName}"></p></h5>
                 <form th:action="@{/changeAllIndoor}" method="POST">
                     <p>From:</p> <input type="date" name="indoorstart">
                     <p>To:</p> <input type="date" name="indoorend">
@@ -42,7 +72,7 @@
 
         <div class="cell auto">
             <div class="callout secondary changeoutdoor">
-                <h5><p>Change all outdoor activities to <span th:text="${defaultOutdoor}"></span></p></h5>
+                <h5><p>Change outdoor activities for date range to: <span th:text="${outdoorBikeName}"></span></p></h5>
                 <form th:action="@{/changeAllOutdoor}" method="POST">
                     <p>From:</p> <input type="date" name="outdoorstart">
                     <p>To:</p> <input type="date" name="outdoorend">
