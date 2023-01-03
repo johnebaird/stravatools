@@ -1,0 +1,41 @@
+spring:
+  thymeleaf:
+    cache: false
+    enabled: true
+    prefix: classpath:/templates/
+    sufix: .html
+
+  application:
+    name: Bootstrap StravaTools
+ 
+  stravatools:
+    client_id: <client id from strava>
+    client_secret: <client secret from strava>
+
+  data:
+    cassandra:
+      schema-action: CREATE_IF_NOT_EXISTS
+      username: <astra db username>
+      password: <astra db password>
+      request.timeout: 10s
+      connection.connect-timeout: 10s
+      connection.init-query-timeout: 10s
+
+astra:
+  api:
+    application-token: <astra application token>
+    database-id: <astra db id>
+    database-region: us-east1
+    cross-region-failback: false
+    grpc:
+      enabled: true
+  cql:
+    enabled: true
+    download-scb:
+      enabled: true
+    driver-config:
+      basic:
+        session-keyspace: <astra db keyspace>
+
+
+
