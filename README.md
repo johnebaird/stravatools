@@ -15,3 +15,4 @@ Not currently hosted anywhere will need to self host to use
 - copy application.yaml.template to application.yaml in ./src/main/resources
 - fill out relevent strava and astra information in application.yaml
 - run maven to install dependencies and run application: *mvnw clean install spring-boot:run*
+- access stravatools at http://localhost:8080 and register and link strava account
