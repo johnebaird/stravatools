@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.time.ZoneOffset;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -25,6 +26,9 @@ public class SimpleController {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private MaintenanceRepository maintenanceRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -177,9 +181,124 @@ public class SimpleController {
         
         return "redirect:/me/defaultbikes";                                                           
     }
+
+    @PostMapping("/removeMaintenance")
+    public String removeMaintenance(Authentication authentication, @RequestParam(name="uuid", required=true) String uuid, Model model, 
+                                                                @ModelAttribute("user") User user, @ModelAttribute("strava") RestService strava) {
     
+
+        if (user.getUsername() == null) { 
+            user = loadUser(authentication, model, user);
+            if (user.getBearerUUID() == null) {
+                return "redirect:/stravaauth";
+            }
+            else {
+                strava = loadBearer(user, strava, model);
+            }
+        }
+
+        List<Maintenance> maintenance = maintenanceRepository.findByUsername(user.getUsername());
+
+        for (Maintenance m : maintenance) {
+            if (uuid.equals(m.getUuid().toString())) {
+                logger.info("deleted maintenance activity with uuid: " + uuid);
+                maintenanceRepository.delete(m);
+            }
+        }
+
+    return "redirect:/me/maintenance";
+    }
+
+
+
+    @PostMapping("/setMaintenance")
+    public String setMaintenance(Authentication authentication, @RequestParam(name="uuid", required=true) String uuid,
+                                                                @RequestParam(name="bike", required=true) String bike,
+                                                                @RequestParam(name="triggerEvery", required=true) String triggerEvery,
+                                                                @RequestParam(name="emailAddress", required=true) String emailAddress,
+                                                                @RequestParam(name="message", required=true) String message, 
+                                                                @RequestParam(name="enabled", required=false) String enabled, Model model, 
+                                                                @ModelAttribute("user") User user, @ModelAttribute("strava") RestService strava) {
+        if (user.getUsername() == null) { 
+            user = loadUser(authentication, model, user);
+            if (user.getBearerUUID() == null) {
+                return "redirect:/stravaauth";
+            }
+            else {
+                strava = loadBearer(user, strava, model);
+            }
+        }
+
+        UUID u;
+        long trigger;
+                
+        if (triggerEvery.equals("")) { trigger = 0; }
+        else {trigger = Long.parseLong(triggerEvery);}
+
+        if (uuid.equals("new")) { 
+            u = UUID.randomUUID(); 
+            Maintenance m = new Maintenance(user.getUsername(), u, bike, emailAddress, trigger * 1000, message);
+
+            // set current distance to 'last triggered' so we count up from now
+            Bikes[] allbikes = user.getAthlete().getBikes();
+            for (Bikes b : allbikes) {
+                if (bike.equals(b.getId())) {
+                    m.setLastTriggeredDistance(b.getDistance());
+                }
+            }
+            
+            if (enabled != null) {
+                if (enabled.equals("on")) { m.setEnabled(true); }
+            }
+            maintenanceRepository.save(m);
+        }
+        else { 
+            // existing maintenance activity
+            u = UUID.fromString(uuid); 
+            List<Maintenance> allmaintenance = maintenanceRepository.findByUsername(user.getUsername());
+
+            for (Maintenance m : allmaintenance) {
+                if (m.getUuid().equals(u)) {
+                    m.setBike(bike);
+                    m.setTriggerEvery(trigger * 1000);
+                    m.setMessage(message);
+
+                    if (enabled != null) {
+                        if (enabled.equals("on")) { m.setEnabled(true); }
+                    }
+                    else {
+                        m.setEnabled(false);
+                    }
+                    maintenanceRepository.save(m);
+                }
+            }
+
+        }
+            
+                        
+        return "redirect:/me/maintenance";                 
+    }
+
     @GetMapping("/me/maintenance")
     public String maintenance(Authentication authentication, Model model, @ModelAttribute("user") User user, @ModelAttribute("strava") RestService strava) {
+
+        if (user.getUsername() == null) { 
+            user = loadUser(authentication, model, user);
+            if (user.getBearerUUID() == null) {
+                return "redirect:/stravaauth";
+            }
+            else {
+                strava = loadBearer(user, strava, model);
+            }
+        }
+
+        Bikes[] bikes = user.getAthlete().getBikes();
+
+        List<Maintenance> maintenance = maintenanceRepository.findByUsername(user.getUsername());
+        
+        model.addAttribute("bikes", bikes);
+        model.addAttribute("maintenance", maintenance);
+        model.addAttribute("athlete", user.getAthlete());
         return "me/maintenance";
 
     }
