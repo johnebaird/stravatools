@@ -21,6 +21,9 @@ spring:
       connection.connect-timeout: 10s
       connection.init-query-timeout: 10s
 
+sendgrid_api_key: <api key here>
+sendgrid_from_address: <email address>
+
 astra:
   api:
     application-token: <astra application token>
