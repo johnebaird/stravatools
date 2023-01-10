@@ -5,6 +5,79 @@
 
 <body>
 
+    <div class="grid-x">    
+        <div class="cell auto">
+            <div class="callout primary">
+                <table class="maintenance">
+                        <tr> 
+                            <th>Bike</th> 
+                            <th>Trigger Every (k)</th> 
+                            <th>Email / Phone Number*</th> 
+                            <th>Message</th>
+                            <th>Enabled</th>
+                            <th></th>
+                            <th></th>
+                        </tr>
+                        <tr th:each="maintenance : ${maintenance}"> 
+                            <form th:action="@{/setMaintenance}" method="POST">
+                                <input type="hidden" name="uuid" th:value="${maintenance.uuid}">
+                                <td>
+                                    <select name="bike" id="bike">
+                                        <option th:each="bikes : ${bikes}" name="bike" th:value="${bikes.id}" th:text="${bikes.name}" th:selected="${bikes.id == maintenance.bike}"></option>
+                                    </select>
+                                </td>
+                                <td><input type="text" th:value="${#numbers.formatDecimal(maintenance.triggerEvery / 1000, 0, 0)}" name="triggerEvery"></td>
+                                <td><input type="text" th:value="${maintenance.emailAddress}" name="emailAddress"></td>
+                                <td><input type="text" th:value="${maintenance.message}" name="message"></td>
+                                <td>
+                                    <div class="switch">
+                                        <input th:if="${maintenance.enabled}" onChange="this.form.submit()" th:id="${maintenance.uuid} + 'enabled'" class="switch-input" type="checkbox" checked="checked" th:name="enabled">
+                                        <input th:unless="${maintenance.enabled}" onChange="this.form.submit()" th:id="${maintenance.uuid} + 'enabled'" class="switch-input" type="checkbox" th:name="enabled">
+                                        <label class="switch-paddle" th:for="${maintenance.uuid} + 'enabled'"></label>
+                                    </div>
+                                </td>
+                                <td>
+                                    <button class="submit button" type="submit">Apply</button>
+                                </td>
+                            </form>
+                            <td>
+                                <form th:action="@{/removeMaintenance}" method="POST">
+                                    <button class="submit button" type="submit">Delete</button>
+                                    <input type="hidden" name="uuid" th:value="${maintenance.uuid}">
+                                </form>
+                            <td>
+                        </tr>
+                        <tr> 
+                            <form th:action="@{/setMaintenance}" method="POST">
+                                <input type="hidden" name="uuid" value="new">
+                                <td>
+                                    <select name="bike" id="bike">
+                                        <option th:each="bikes : ${bikes}" name="bike" th:value="${bikes.id}" th:text="${bikes.name}"></option>
+                                    </select>
+                                </td>
+                                <td><input type="text" name="triggerEvery"></td>
+                                <td><input type="text" name="emailAddress"></td>
+                                <td><input type="text" name="message"></td>
+                                <td>
+                                    <div class="switch">
+                                        <input onChange="this.form.submit()" id="newenabled" class="switch-input" type="checkbox" name="enabled">
+                                        <label class="switch-paddle" for="newenabled"></label>
+                                    </div>
+                                </td>
+                                <td><button class="submit button" type="submit">New</button></td>
+                                <td></td>
+                            </form>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="cell auto">
+            <div class="callout primary">
+                <span>* For text message you can use your cell carrier <a href="https://www.howtogeek.com/27051/use-email-to-send-text-messages-sms-to-mobile-phones-for-free/">SMS Gateway</a> ex: 1234567890@carrier.com </span>
+            </div>
+        </div>
+    </div>    
 
     <div th:replace="fragments/footer"></div>
 

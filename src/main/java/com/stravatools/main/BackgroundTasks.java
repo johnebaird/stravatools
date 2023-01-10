@@ -22,6 +22,9 @@ public class BackgroundTasks {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private MaintenanceRepository maintenanceRepository;
+
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Value("${spring.stravatools.client_id}")
@@ -72,9 +75,61 @@ public class BackgroundTasks {
                 }
             }
         }
-     
 
     }
+    @Scheduled(cron = "0 */10 * * * ?")
+    public void maintenanceReminder() { 
+
+        logger.info("Running maintenanceReminder task");
+
+        List<Maintenance> maintenance = maintenanceRepository.findAll();
+
+        this.strava.setClientId(clientId);
+        this.strava.setClientSecret(clientSecret);
+
+        for (Maintenance m : maintenance) {
+
+            logger.info("Checking Maintenance id " + m.getUuid() + " for " + m.getUsername());
+
+            if (m.isEnabled()) {
+
+                logger.debug("looking up user " + m.getUsername());
+                User user = userRepository.findByUsername(m.getUsername());
+
+                if (user.getBearerUUID() == null) { break; }
+
+                logger.debug("getting bearer token for " + user.getUsername());
+                Bearer currentBearer = bearerRepository.findById(user.getBearerUUID()).get();
+        
+                strava.setBearerToken(currentBearer);
+                strava.refreshBearerToken();
+                bearerRepository.save(strava.getBearerToken());
+
+                logger.info("looking up bikes for " + user.getUsername());
+                Bikes[] bikes = strava.postforAthlete().getBikes();
+
+                for (Bikes bike : bikes) {
+
+                    if (bike.getId().equals(m.getBike())) {
+                        logger.debug("checking distance on " + bike.getName());
+
+                        if (bike.getDistance() > m.getLastTriggeredDistance() + m.getTriggerEvery()) {
+                            logger.info("Sending email for " + m.getEmailAddress() + " - " + bike.getName() + " - " + m.getMessage());
+                            MailApi.sendEmail(m.getEmailAddress(), "Maintenance Reminder for " + bike.getName(), m.getMessage());
+                            m.setLastTriggeredDistance(bike.getDistance());
+                        }
+                                                
+                    }
+                }
+
+                
+                
+                
+            }
+
+        }
+    }
+
 }
 
 
