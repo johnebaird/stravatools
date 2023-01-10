@@ -22,7 +22,7 @@ public class Maintenance implements Serializable {
 
     private String bike;
 
-    private String phoneNumber;
+    private String emailAddress;
 
     private long lastTriggeredDistance;
 
@@ -37,11 +37,11 @@ public class Maintenance implements Serializable {
         this.enabled = false;
     }
 
-    public Maintenance(String username, UUID uuid, String bike, String phoneNumber, long triggerEvery, String message) {
+    public Maintenance(String username, UUID uuid, String bike, String emailAddress, long triggerEvery, String message) {
         this.username = username;
         this.uuid = uuid;
         this.bike = bike;
-        this.phoneNumber = phoneNumber;
+        this.emailAddress = emailAddress;
         this.triggerEvery = triggerEvery;
         this.message = message;
     }
@@ -78,12 +78,12 @@ public class Maintenance implements Serializable {
         this.bike = bike;
     }
 
-    public String getPhoneNumber() {
-        return phoneNumber;
+    public String getEmailAddress() {
+        return emailAddress;
     }
 
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
+    public void setEmailAddress(String phoneNumber) {
+        this.emailAddress = phoneNumber;
     }
 
     public long getLastTriggeredDistance() {

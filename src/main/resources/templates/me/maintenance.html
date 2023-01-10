@@ -12,7 +12,7 @@
                         <tr> 
                             <th>Bike</th> 
                             <th>Trigger Every (k)</th> 
-                            <th>Phone Number</th> 
+                            <th>Email / Phone Number*</th> 
                             <th>Message</th>
                             <th>Enabled</th>
                             <th></th>
@@ -26,8 +26,8 @@
                                         <option th:each="bikes : ${bikes}" name="bike" th:value="${bikes.id}" th:text="${bikes.name}" th:selected="${bikes.id == maintenance.bike}"></option>
                                     </select>
                                 </td>
-                                <td><input type="text" th:value="${maintenance.triggerEvery}" name="triggerEvery"></td>
-                                <td><input type="text" th:value="${maintenance.phoneNumber}" name="phoneNumber"></td>
+                                <td><input type="text" th:value="${#numbers.formatDecimal(maintenance.triggerEvery / 1000, 0, 0)}" name="triggerEvery"></td>
+                                <td><input type="text" th:value="${maintenance.emailAddress}" name="emailAddress"></td>
                                 <td><input type="text" th:value="${maintenance.message}" name="message"></td>
                                 <td>
                                     <div class="switch">
@@ -56,7 +56,7 @@
                                     </select>
                                 </td>
                                 <td><input type="text" name="triggerEvery"></td>
-                                <td><input type="text" name="phoneNumber"></td>
+                                <td><input type="text" name="emailAddress"></td>
                                 <td><input type="text" name="message"></td>
                                 <td>
                                     <div class="switch">
@@ -70,6 +70,11 @@
                         </tr>
                     </table>
                 </div>
+            </div>
+        </div>
+        <div class="cell auto">
+            <div class="callout primary">
+                <span>* For text message you can use your cell carrier <a href="https://www.howtogeek.com/27051/use-email-to-send-text-messages-sms-to-mobile-phones-for-free/">SMS Gateway</a> ex: 1234567890@carrier.com </span>
             </div>
         </div>
     </div>    

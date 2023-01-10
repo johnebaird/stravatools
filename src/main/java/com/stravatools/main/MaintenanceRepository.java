@@ -10,4 +10,6 @@ import org.springframework.stereotype.Repository;
 public interface MaintenanceRepository extends CassandraRepository<Maintenance, UUID> {
 
     List<Maintenance> findByUsername(String username);
+
+    
 }

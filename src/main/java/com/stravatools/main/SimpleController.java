@@ -215,7 +215,7 @@ public class SimpleController {
     public String setMaintenance(Authentication authentication, @RequestParam(name="uuid", required=true) String uuid,
                                                                 @RequestParam(name="bike", required=true) String bike,
                                                                 @RequestParam(name="triggerEvery", required=true) String triggerEvery,
-                                                                @RequestParam(name="phoneNumber", required=true) String phoneNumber,
+                                                                @RequestParam(name="emailAddress", required=true) String emailAddress,
                                                                 @RequestParam(name="message", required=true) String message, 
                                                                 @RequestParam(name="enabled", required=false) String enabled, Model model, 
                                                                 @ModelAttribute("user") User user, @ModelAttribute("strava") RestService strava) {
@@ -231,31 +231,51 @@ public class SimpleController {
 
         UUID u;
         long trigger;
-
-        if (uuid.equals("new")) { u = UUID.randomUUID(); }
-        else { u = UUID.fromString(uuid); }
-
+                
         if (triggerEvery.equals("")) { trigger = 0; }
         else {trigger = Long.parseLong(triggerEvery);}
 
-        Maintenance m = new Maintenance(user.getUsername(), u, bike, phoneNumber, trigger, message);
-        
-        if (enabled != null) {
-            if (enabled.equals("on")) { m.setEnabled(true); }
-        }
-        
-        // new entry so update the 'last triggered' with current bike distance
-        if (uuid.equals("new")) {
+        if (uuid.equals("new")) { 
+            u = UUID.randomUUID(); 
+            Maintenance m = new Maintenance(user.getUsername(), u, bike, emailAddress, trigger * 1000, message);
+
+            // set current distance to 'last triggered' so we count up from now
             Bikes[] allbikes = user.getAthlete().getBikes();
             for (Bikes b : allbikes) {
                 if (bike.equals(b.getId())) {
                     m.setLastTriggeredDistance(b.getDistance());
                 }
             }
+            
+            if (enabled != null) {
+                if (enabled.equals("on")) { m.setEnabled(true); }
+            }
+            maintenanceRepository.save(m);
+        }
+        else { 
+            // existing maintenance activity
+            u = UUID.fromString(uuid); 
+            List<Maintenance> allmaintenance = maintenanceRepository.findByUsername(user.getUsername());
+
+            for (Maintenance m : allmaintenance) {
+                if (m.getUuid().equals(u)) {
+                    m.setBike(bike);
+                    m.setTriggerEvery(trigger * 1000);
+                    m.setMessage(message);
+
+                    if (enabled != null) {
+                        if (enabled.equals("on")) { m.setEnabled(true); }
+                    }
+                    else {
+                        m.setEnabled(false);
+                    }
+                    maintenanceRepository.save(m);
+                }
+            }
+
         }
             
-        maintenanceRepository.save(m);
-                
+                        
         return "redirect:/me/maintenance";                 
     }
 
