@@ -5,6 +5,74 @@
 
 <body>
 
+    <div class="grid-x"> 
+        <div class="cell auto">
+            <div class="callout primary">
+                <span>Set certain activities or certain activity durations to be muted from the feed seen by your followers, good for hiding short activities or sessions (looking at you peloton) Sessions should still count towards your personal tracking</span>
+            </div>
+        </div>   
+        <div class="cell auto">
+            <div class="callout primary">
+                <table class="muting">
+                        <tr> 
+                            <th>Activity Type</th> 
+                            <th>Minimum duration</th> 
+                            <th>Enabled</th>
+                            <th></th>
+                            <th></th>
+                        </tr>
+                        <tr th:each="muting : ${muting}"> 
+                            <form th:action="@{/setMuting}" method="POST">
+                                <input type="hidden" name="uuid" th:value="${muting.uuid}">
+                                <td>
+                                    <select name="activity" id="activity">
+                                        <option th:each="activity : ${activity}" name="activity" th:value="${activity.name}" th:text="${activity.name}" th:selected="${activity.id == muting.activity}"></option>
+                                    </select>
+                                </td>
+                                <td><input type="text" th:value="${muting.duration}" name="duration"></td>
+                                <td>
+                                    <div class="switch">
+                                        <input th:if="${muting.enabled}" onChange="this.form.submit()" th:id="${muting.uuid} + 'enabled'" class="switch-input" type="checkbox" checked="checked" th:name="enabled">
+                                        <input th:unless="${muting.enabled}" onChange="this.form.submit()" th:id="${muting.uuid} + 'enabled'" class="switch-input" type="checkbox" th:name="enabled">
+                                        <label class="switch-paddle" th:for="${muting.uuid} + 'enabled'"></label>
+                                    </div>
+                                </td>
+                                <td>
+                                    <button class="submit button" type="submit">Apply</button>
+                                </td>
+                            </form>
+                            <td>
+                                <form th:action="@{/removeMuting}" method="POST">
+                                    <button class="submit button" type="submit">Delete</button>
+                                    <input type="hidden" name="uuid" th:value="${muting.uuid}">
+                                </form>
+                            <td>
+                        </tr>
+                        <tr> 
+                            <form th:action="@{/setMuting}" method="POST">
+                                <input type="hidden" name="uuid" value="new">
+                                <td>
+                                    <select name="activity" id="activity">
+                                        <option th:each="activity : ${activities}" name="activity" th:value="${activity.name}" th:text="${activity.name}"></option>
+                                    </select>
+                                </td>
+                                <td><input type="text" name="duration"></td>
+
+                                <td>
+                                    <div class="switch">
+                                        <input onChange="this.form.submit()" id="newenabled" class="switch-input" type="checkbox" name="enabled">
+                                        <label class="switch-paddle" for="newenabled"></label>
+                                    </div>
+                                </td>
+                                <td><button class="submit button" type="submit">New</button></td>
+                                <td></td>
+                            </form>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>    
 
     <div th:replace="fragments/footer"></div>
 

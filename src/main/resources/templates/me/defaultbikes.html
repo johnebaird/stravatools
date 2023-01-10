@@ -4,7 +4,12 @@
 <head th:replace="fragments/loggedheader"> </head>
 
 <body>
-    <div class="grid-x">    
+    <div class="grid-x"> 
+        <div class="cell auto">
+            <div class="callout primary">
+                <span>Set default bike for indoor and outdoor activities if you use different bikes for training indoors and outdoor rides, can either change activities in a range or set for all new activities to be changed</span>
+            </div>
+        </div>   
         <div class="cell auto">
             <div class="callout primary">
                 <form th:action="@{/setBikes}" method="POST">
