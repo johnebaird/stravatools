@@ -31,6 +31,9 @@ public class SimpleController {
     private MaintenanceRepository maintenanceRepository;
 
     @Autowired
+    private MutingRepository mutingRepository;
+
+    @Autowired
     private PasswordEncoder passwordEncoder;
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -305,6 +308,23 @@ public class SimpleController {
 
     @GetMapping("/me/muting")
     public String muting(Authentication authentication, Model model, @ModelAttribute("user") User user, @ModelAttribute("strava") RestService strava) {
+
+        if (user.getUsername() == null) { 
+            user = loadUser(authentication, model, user);
+            if (user.getBearerUUID() == null) {
+                return "redirect:/stravaauth";
+            }
+            else {
+                strava = loadBearer(user, strava, model);
+            }
+        }
+
+        List<Muting> muting = mutingRepository.findByUsername(user.getUsername());
+        
+        model.addAttribute("activities", Muting.ActivityType.values());
+        model.addAttribute("muting", muting);
+        model.addAttribute("athlete", user.getAthlete());
+
         return "me/muting";
 
     }

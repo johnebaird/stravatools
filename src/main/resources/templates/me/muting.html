@@ -8,15 +8,11 @@
     <div class="grid-x"> 
         <div class="cell auto">
             <div class="callout primary">
-                <span>Set certain activities or certain activity durations to be muted from the feed seen by your followers, good for hiding short activities or sessions (looking at you peloton) Sessions should still count towards your personal tracking</span>
-            </div>
-        </div>   
-        <div class="cell auto">
-            <div class="callout primary">
                 <table class="muting">
                         <tr> 
                             <th>Activity Type</th> 
-                            <th>Minimum duration</th> 
+                            <th>Mute Activities shorter than</th> 
+                            <th>all durations</th>
                             <th>Enabled</th>
                             <th></th>
                             <th></th>
@@ -30,6 +26,13 @@
                                     </select>
                                 </td>
                                 <td><input type="text" th:value="${muting.duration}" name="duration"></td>
+                                <td>
+                                    <div class="switch">
+                                        <input th:if="${muting.anyDuration}" th:id="${muting.uuid} + 'anyduration'" class="switch-input" type="checkbox" checked="checked" th:name="anyduration">
+                                        <input th:unless="${muting.anyDuration}" th:id="${muting.uuid} + 'anyduration'" class="switch-input" type="checkbox" th:name="anyduration">
+                                        <label class="switch-paddle" th:for="${muting.uuid} + 'anyduration'"></label>
+                                    </div>
+                                </td>
                                 <td>
                                     <div class="switch">
                                         <input th:if="${muting.enabled}" onChange="this.form.submit()" th:id="${muting.uuid} + 'enabled'" class="switch-input" type="checkbox" checked="checked" th:name="enabled">
