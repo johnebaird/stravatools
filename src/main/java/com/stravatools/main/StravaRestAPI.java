@@ -18,9 +18,13 @@ import org.springframework.http.ResponseEntity;
 
 import org.springframework.web.client.RestTemplate;
 
+import com.stravatools.main.model.Activity;
+import com.stravatools.main.model.Athlete;
+import com.stravatools.main.model.Bearer;
 
 
-public class RestService {
+
+public class StravaRestAPI {
 // Main class for interacting with Strava API
 
     private final RestTemplate restTemplate;
@@ -46,7 +50,7 @@ public class RestService {
         this.clientId = id;
     }
 
-    public RestService() {
+    public StravaRestAPI() {
         this.restTemplate = new RestTemplate();
     }
 
@@ -116,6 +120,25 @@ public class RestService {
         builder.appendPath(Long.toString(activity));
 
         String body = String.format("{\"gear_id\": \"%s\"}", bike);
+        
+        try {
+            URI uri = builder.build();
+            return putToStravaAPI(uri, body);
+        }
+        catch (URISyntaxException u) {
+            u.printStackTrace();
+            return null;
+        }
+    }
+
+    public String setActivityToMuted(long activity) {
+        // takes paticular activity and set hide_from_home = true
+        // which will hide it from the main feed
+
+        URIBuilder builder = getStravaURI("/activities/");
+        builder.appendPath(Long.toString(activity));
+
+        String body = String.format("{\"hide_from_home\": true}");
         
         try {
             URI uri = builder.build();

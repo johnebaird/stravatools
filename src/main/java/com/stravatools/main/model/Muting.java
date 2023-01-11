@@ -1,6 +1,5 @@
-package com.stravatools.main;
+package com.stravatools.main.model;
 
-import java.io.Serializable;
 import java.util.UUID;
 
 import org.springframework.data.cassandra.core.cql.Ordering;
@@ -29,6 +28,13 @@ public class Muting {
     private boolean anyDuration;
 
     private boolean enabled;
+
+    public Muting(String username, UUID uuid, ActivityType activity, long duration) {
+        this.username = username;
+        this.uuid = uuid;
+        this.activity = activity;
+        this.duration = duration;
+    }
 
     public String getUsername() {
         return username;

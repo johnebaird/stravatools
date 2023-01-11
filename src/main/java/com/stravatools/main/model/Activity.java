@@ -1,4 +1,4 @@
-package com.stravatools.main;
+package com.stravatools.main.model;
 
 import java.io.Serializable;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -13,6 +13,7 @@ public class Activity implements Serializable {
     private String type;
     private String gear_id;
     private String sport_type;
+    private long elapsed_time;
     private boolean commute;
     private boolean trainer;
     private boolean hide_from_home;
@@ -36,6 +37,13 @@ public class Activity implements Serializable {
     }
     public void setName(String name) {
         this.name = name;
+    }
+    
+    public long getElapsed_time() {
+        return elapsed_time;
+    }
+    public void setElapsed_time(long elapsed_time) {
+        this.elapsed_time = elapsed_time;
     }
     
     public String getType() {

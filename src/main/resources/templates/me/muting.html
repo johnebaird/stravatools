@@ -11,8 +11,8 @@
                 <table class="muting">
                         <tr> 
                             <th>Activity Type</th> 
-                            <th>Mute Activities shorter than</th> 
-                            <th>all durations</th>
+                            <th>Mute Activities shorter than (minutes)</th> 
+                            <th>Mute all activities</th>
                             <th>Enabled</th>
                             <th></th>
                             <th></th>
@@ -22,14 +22,16 @@
                                 <input type="hidden" name="uuid" th:value="${muting.uuid}">
                                 <td>
                                     <select name="activity" id="activity">
-                                        <option th:each="activity : ${activity}" name="activity" th:value="${activity.name}" th:text="${activity.name}" th:selected="${activity.id == muting.activity}"></option>
+                                        <option th:each="activity : ${activities}" name="activity" th:value="${activity.name}" th:text="${activity.name}" th:selected="${activity == muting.activity}"></option>
                                     </select>
                                 </td>
-                                <td><input type="text" th:value="${muting.duration}" name="duration"></td>
+                                <td><input th:if="${muting.anyDuration}" disabled type="text" th:value="${muting.duration}" name="duration">
+                                    <input th:unless="${muting.anyDuration}" type="text" th:value="${muting.duration}" name="duration">
+                                </td>
                                 <td>
                                     <div class="switch">
-                                        <input th:if="${muting.anyDuration}" th:id="${muting.uuid} + 'anyduration'" class="switch-input" type="checkbox" checked="checked" th:name="anyduration">
-                                        <input th:unless="${muting.anyDuration}" th:id="${muting.uuid} + 'anyduration'" class="switch-input" type="checkbox" th:name="anyduration">
+                                        <input th:if="${muting.anyDuration}" onChange="this.form.submit()" th:id="${muting.uuid} + 'anyduration'" class="switch-input" type="checkbox" checked="checked" th:name="anyDuration">
+                                        <input th:unless="${muting.anyDuration}" onChange="this.form.submit()" th:id="${muting.uuid} + 'anyduration'" class="switch-input" type="checkbox" th:name="anyDuration">
                                         <label class="switch-paddle" th:for="${muting.uuid} + 'anyduration'"></label>
                                     </div>
                                 </td>
