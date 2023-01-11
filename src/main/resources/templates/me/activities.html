@@ -21,9 +21,9 @@
                     <th>Type</th> 
                     <th>Gear</th>
                     <th>Sport Type</th>
+                    <th>Duratrion</th> 
                     <th>Commute?</th>
                     <th>Trainer?</th>
-                    <th>Hidden?</th>
                     <th>Description</th>
                 </tr>
             </thead>
@@ -35,9 +35,9 @@
                     <td th:text="${activity.type}"></td>
                     <td th:text="${activity.gear_id}"></td>
                     <td th:text="${activity.sport_type}"></td>
+                    <td th:text="${activity.elapsed_time}"></td>
                     <td th:text="${activity.commute}"></td>
                     <td th:text="${activity.trainer}"></td>
-                    <td th:text="${activity.hide_from_home}"></td>
                     <td th:text="${activity.description}"></td>
                 </tr>
             </tbody>
