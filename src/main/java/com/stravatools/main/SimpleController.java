@@ -508,9 +508,6 @@ public class SimpleController {
                                                             @ModelAttribute("strava") StravaRestAPI strava) {
         
         // returns page that shows pages of activities
-        logger.debug("activities called with user: " + user.getUsername() + " " + user.getBearerUUID());
-        logger.debug("activities called with strava: " + strava.toString());
-
         if (user.getUsername() == null) { 
             user = loadUser(authentication, model, user);
             if (user.getBearerUUID() == null) {
@@ -522,8 +519,6 @@ public class SimpleController {
         }
         
         logger.debug("activities after load user: " + user.getUsername() + " " + user.getBearerUUID());
-        logger.debug("activities after load strava: " + strava.toString());
-
 
         int currentPage = 1;
         if (page.isPresent()) { currentPage = page.get(); }
