@@ -100,42 +100,71 @@ public class BackgroundTasks {
         this.strava.setClientId(clientId);
         this.strava.setClientSecret(clientSecret);
 
+        User user = null;
+        Activity[] allActivities = null;
+
         for (Muting m : allmuting) {
 
             logger.info("Checking Muting id " + m.getUuid() + " for " + m.getUsername());
 
+            long lastUpdated = m.getLastUpdatedId();
+            boolean firstFound = true;
+
             if (m.isEnabled()) {
                 logger.debug("looking up user " + m.getUsername());
-                User user = userRepository.findByUsername(m.getUsername());
+                
+                if (user == null || user.getUsername().equals(m.getUsername())) {
 
-                if (user.getBearerUUID() == null) { break; }
+                    // only need to do this if the user is different
+                    user = userRepository.findByUsername(m.getUsername());
 
-                logger.debug("getting bearer token for " + user.getUsername());
-                Bearer currentBearer = bearerRepository.findById(user.getBearerUUID()).get();
-        
-                strava.setBearerToken(currentBearer);
-                strava.refreshBearerToken();
-                bearerRepository.save(strava.getBearerToken());
+                    if (user.getBearerUUID() == null) { break; }
 
-                Activity[] allActivities = strava.getAthleteActivities();
+                    logger.debug("getting bearer token for " + user.getUsername());
+                    Bearer currentBearer = bearerRepository.findById(user.getBearerUUID()).get();
 
+                    strava.setBearerToken(currentBearer);
+                    strava.refreshBearerToken();
+                    bearerRepository.save(strava.getBearerToken());
+
+                    allActivities = strava.getAthleteActivities();
+                }
 
                 for (Activity a : allActivities) {
 
                     logger.debug("Checking activity id " + a.getId() + " - " + a.getDescription() + " of type " + a.getSport_type() );
 
+                    if (a.getId() == lastUpdated) {
+                        logger.debug("Found last updated activity of " + a.getId() + " breaking");
+                        break;
+                    }
+
                     // if anyDuration is set change all activities that match the activity type
                     if (m.isAnyDuration()) {
-                        if (a.isHide_from_home() == false && a.getSport_type().equals(m.getActivity().toString())) {
+                        if (a.getSport_type().equals(m.getActivity().toString())) {
                             logger.debug("Muting activity id " + a.getId());
                             strava.setActivityToMuted(a.getId());
+                            
+                            // first activity found should be the last activity we look at for the next run
+                            if (firstFound) {
+                                m.setLastUpdatedId(a.getId());
+                                mutingRepository.save(m);
+                                firstFound = false;
+                            }
                         }
                     }
                     else {
                         // any duration not set need to check duration of activity is less than set limit
-                        if (a.isHide_from_home() == false && a.getSport_type().equals(m.getActivity().toString()) && a.getElapsed_time() < (m.getDuration() * 60)) {
+                        if (a.getSport_type().equals(m.getActivity().toString()) && a.getElapsed_time() < (m.getDuration() * 60)) {
                             logger.debug("Muting activity id " + a.getId());
                             strava.setActivityToMuted(a.getId());
+                            
+                            // first activity found should be the last activity we look at for the next run
+                            if (firstFound) {
+                                m.setLastUpdatedId(a.getId());
+                                mutingRepository.save(m);
+                                firstFound = false;
+                            }
                         }
                     }
 

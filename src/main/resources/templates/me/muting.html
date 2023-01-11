@@ -62,7 +62,12 @@
                                     </select>
                                 </td>
                                 <td><input type="text" name="duration"></td>
-
+                                <td>
+                                    <div class="switch">
+                                        <input onChange="this.form.submit()" id="newanyduration" class="switch-input" type="checkbox" name="anyDuration">
+                                        <label class="switch-paddle" for="newanyduration"></label>
+                                    </div>
+                                </td>
                                 <td>
                                     <div class="switch">
                                         <input onChange="this.form.submit()" id="newenabled" class="switch-input" type="checkbox" name="enabled">

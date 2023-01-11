@@ -29,6 +29,9 @@ public class Muting {
 
     private boolean enabled;
 
+    private long lastUpdatedId;
+
+
     public Muting(String username, UUID uuid, ActivityType activity, long duration) {
         this.username = username;
         this.uuid = uuid;
@@ -82,6 +85,13 @@ public class Muting {
 
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
+    }
+    public long getLastUpdatedId() {
+        return lastUpdatedId;
+    }
+
+    public void setLastUpdatedId(long lastUpdatedId) {
+        this.lastUpdatedId = lastUpdatedId;
     }
 
 }

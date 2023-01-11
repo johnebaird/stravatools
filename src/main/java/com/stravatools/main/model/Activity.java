@@ -16,7 +16,6 @@ public class Activity implements Serializable {
     private long elapsed_time;
     private boolean commute;
     private boolean trainer;
-    private boolean hide_from_home;
     private String description;
     private String start_date;
     
@@ -76,12 +75,7 @@ public class Activity implements Serializable {
     public void setTrainer(boolean trainer) {
         this.trainer = trainer;
     }
-    public boolean isHide_from_home() {
-        return hide_from_home;
-    }
-    public void setHide_from_home(boolean hide_from_home) {
-        this.hide_from_home = hide_from_home;
-    }
+
     public String getDescription() {
         return description;
     }
