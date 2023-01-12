@@ -33,7 +33,7 @@ public class MailApi {
     private static RestTemplate restTemplate = new RestTemplate();
     private static Logger logger = LoggerFactory.getLogger(MailApi.class);
     
-    public static String sendEmail(String to, String subject, String content) {
+    public static HttpStatus sendEmail(String to, String subject, String content) {
 
         logger.debug("sendEmail called with apikey: " + apikey);
 
@@ -45,7 +45,7 @@ public class MailApi {
 
         String body = String.format("{\"personalizations\": [{\"to\": [{\"email\": \"%s\"}]}],\"from\": "+
                                     "{\"email\": \"%s\"},\"subject\": \"%s\",\"content\": "+
-                                    "[{\"type\": \"text/plain\", \"value\": \"%s\"}]}", to, fromAddress, subject, content);
+                                    "[{\"type\": \"text/plain\", \"value\": \"%s <%%asm_global_unsubscribe_url%%> \"}]}", to, fromAddress, subject, content);
 
         HttpEntity<String> request = new HttpEntity<>(body, headers);
         
@@ -53,7 +53,7 @@ public class MailApi {
         
         if (response.getStatusCode() == HttpStatus.ACCEPTED) {
             logger.info("Successfully sent email to " + to);
-            return response.getBody();
+            return response.getStatusCode();
         }
         else {
             logger.info("Error sending email to " + to + " " + response.getStatusCode() + " " + response.getBody());
