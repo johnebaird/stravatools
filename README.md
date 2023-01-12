@@ -3,9 +3,9 @@
 ## Java and Spring Boot application to provide some useful features for Strava that aren't currently implemented on the website
 
 ### Features: 
-- Default Indoor and Outdoor bikes
+- Default Indoor and Outdoor bikes and ability to change a range of activities to that outdoor or indoor bike 
 - Maintenance reminder to do certain actions every X kilometers (eg: wax your chain)
-- Mute activities: mute certain activities from the feed by default by type or duration - In Progress
+- Mute activities: mute certain activities from the feed by default by type of activity or duration, eg: mute all walking/yoga or activities <5min
 
 Not currently hosted anywhere will need to self host to use
 
