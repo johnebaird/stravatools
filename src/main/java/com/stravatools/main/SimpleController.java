@@ -509,22 +509,22 @@ public class SimpleController {
         
         // returns page that shows pages of activities
         if (user.getUsername() == null) { 
+            logger.debug("user not saved in session, loading..");
             user = loadUser(authentication, model, user);
             if (user.getBearerUUID() == null) {
+                logger.debug("no strava auth for this user redirecting to /stravaauth");
                 return "redirect:/stravaauth";
             }
             else {
+                logger.debug("Loading bearer token for " + user.getUsername());
                 strava = loadBearer(user, strava, model);
             }
         }
         
-        logger.debug("activities after load user: " + user.getUsername() + " " + user.getBearerUUID());
-
         int currentPage = 1;
         if (page.isPresent()) { currentPage = page.get(); }
         
-        logger.debug("Using access_token: " + strava.getBearerToken().getAccess_token());
-        
+        logger.debug("loading activities for " + user.getUsername());
         Activity[] activities = strava.getAthleteActivities(currentPage);
         
         model.addAttribute("athlete", user.getAthlete());

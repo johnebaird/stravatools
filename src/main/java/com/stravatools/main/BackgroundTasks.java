@@ -91,7 +91,7 @@ public class BackgroundTasks {
         }
 
     }
-    @Scheduled(cron = "0 */10 * * * ?")
+    @Scheduled(cron = "0 */15 * * * ?")
     public void muteActivities() {
         logger.info("Running activity muting task");
 
