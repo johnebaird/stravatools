@@ -200,7 +200,7 @@ public class StravaRestAPI {
         int changedActivities = 0;
         for(Activity a: activities) {
 
-            if (a.isTrainer() && (a.getSport_type().equals("Ride") || a.getSport_type().equals("VirtualRide"))) {
+            if ((a.isTrainer() && a.getSport_type().equals("Ride")) || a.getSport_type().equals("VirtualRide")) {
                 
                 logger.info("Found indoor cadidate to change: " + a.getId() + " " + a.getName());
                 
@@ -220,7 +220,7 @@ public class StravaRestAPI {
         int changedActivities = 0;
         for(Activity a: activities) {
 
-            if (!a.isTrainer() && (a.getSport_type().equals("Ride") || a.getSport_type().equals("VirtualRide"))) {
+            if (!a.isTrainer() && a.getSport_type().equals("Ride")) {
                 
                 logger.info("Found outdoor cadidate to change: " + a.getId() + " " + a.getName());
                 
