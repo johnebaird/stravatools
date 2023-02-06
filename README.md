@@ -13,7 +13,6 @@ Not currently hosted anywhere will need to self host to use
 - Sign up for Strava API and copy application id and secret information
 - Sign up for Astra DB or host your own cassandra instance
 - Sign up for Sendmail if you want maintenance notifications
-- copy application.yaml.template to application.yaml in ./src/main/resources
-- fill out relevent strava, astra and sendmail information in application.yaml
+- set STRAVA_CLIENT_ID,STRAVA_CLIENT_SECRET,CASSANDRA_USERNAME,CASSANDRA_PASSWORD, etc.. as environment variables or set hardcoded into application.yaml
 - run maven to install dependencies and run application: *mvnw clean install spring-boot:run*
 - access stravatools at http://localhost:8080 and register and link strava account
