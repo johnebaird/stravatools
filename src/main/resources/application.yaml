@@ -9,25 +9,25 @@ spring:
     name: Bootstrap StravaTools
  
   stravatools:
-    client_id: <client id from strava>
-    client_secret: <client secret from strava>
+    client_id: ${STRAVA_CLIENT_ID}
+    client_secret: ${STRAVA_CLIENT_SECRET}
 
   data:
     cassandra:
       schema-action: CREATE_IF_NOT_EXISTS
-      username: <astra db username>
-      password: <astra db password>
+      username: ${CASSANDRA_USERNAME}
+      password: ${CASSANDRA_PASSWORD}
       request.timeout: 10s
       connection.connect-timeout: 10s
       connection.init-query-timeout: 10s
 
-sendgrid_api_key: <api key here>
-sendgrid_from_address: <email address>
+sendgrid_api_key: ${SENDGRID_API_KEY}
+sendgrid_from_address: ${SENDGRID_FROM_ADDRESS}
 
 astra:
   api:
-    application-token: <astra application token>
-    database-id: <astra db id>
+    application-token: ${ASTRA_APPLICATION_TOKEN}
+    database-id: ${ASTRA_DATABASE_ID}
     database-region: us-east1
     cross-region-failback: false
     grpc:
@@ -38,7 +38,9 @@ astra:
       enabled: true
     driver-config:
       basic:
-        session-keyspace: <astra db keyspace>
+        session-keyspace: stravatools
 
+logging.level.org.springframework.web.client.RestTemplate: DEBUG
+logging.level.com.stravatools.main: DEBUG
 
 

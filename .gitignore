@@ -4,6 +4,5 @@
 application.properties
 Test.java
 demo/demo/src/main/astra/secure-connect-spring-cassandra.zip
-application.yaml
 target/*
 
