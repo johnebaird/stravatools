@@ -1,5 +1,5 @@
 from django.http import HttpResponse
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 
 # Create your views here.
 
@@ -10,9 +10,12 @@ def login(request):
     return render(request, 'main/login.html')
 
 def register(request):
-    return render(request, 'main/register.html')
+    if 'code' in request.session:
+        return render(request, 'main/register.html')
+    else:
+        return redirect(index)
 
 def exchange_token(request):
-    return HttpResponse(request.GET.values())
-
+    request.session['code'] = request.GET['code']
+    return redirect(register)
 

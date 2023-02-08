@@ -1,4 +1,7 @@
 from django.db import models
+from django.contrib.auth.models import User
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 # Create your models here.
 
@@ -18,12 +21,20 @@ class Bike(models.Model):
     model_name = models.CharField(max_length=100)
     description = models.CharField(max_length=200)
 
-class User(models.Model):
-    username = models.CharField(max_length=100)
-    account_locked = models.BooleanField
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
     autochange_indoor_bike = models.BooleanField
     autochange_outdoor_bike = models.BooleanField
     bearer = models.ForeignKey(Bearer, on_delete=models.CASCADE)
     indoor_bike = models.ForeignKey(Bike, on_delete=models.CASCADE, related_name='indoor_bike')
     outdoor_bike = models.ForeignKey(Bike, on_delete=models.CASCADE, related_name='outdoor_bike')
-    # password
+
+@receiver(post_save, sender=User)
+def create_user_profile(sender, instance, created, **kwargs):
+    if created:
+        Profile.objects.create(user=instance)
+
+@receiver(post_save, sender=User)    
+def save_user_profile(sender, instance, **kwargs):
+    instance.profile.save()
+    

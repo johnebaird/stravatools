@@ -6,3 +6,4 @@ Test.java
 demo/demo/src/main/astra/secure-connect-spring-cassandra.zip
 target/*
 
+*.pyc
