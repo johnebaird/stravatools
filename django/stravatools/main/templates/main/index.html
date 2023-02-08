@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8" />
+    <title>Stravatools Index</title>
+
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+  </head>
+
+  <body>
+    <h1>Index page</h1>
+    <a href="https://www.strava.com/oauth/authorize?client_id=96771&response_type=code&redirect_uri=http://localhost:8000/exchange_token&scope=activity:read_all,activity:write,profile:read_all">Autorize Strava</a>
+  </body>
+</html>
