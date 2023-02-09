@@ -23,11 +23,11 @@ class Bike(models.Model):
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    autochange_indoor_bike = models.BooleanField
-    autochange_outdoor_bike = models.BooleanField
-    bearer = models.ForeignKey(Bearer, on_delete=models.CASCADE)
-    indoor_bike = models.ForeignKey(Bike, on_delete=models.CASCADE, related_name='indoor_bike')
-    outdoor_bike = models.ForeignKey(Bike, on_delete=models.CASCADE, related_name='outdoor_bike')
+    autochange_indoor_bike = models.BooleanField(default=False)
+    autochange_outdoor_bike = models.BooleanField(default=False)
+    bearer = models.ForeignKey(Bearer, on_delete=models.CASCADE, blank=True, null=True)
+    indoor_bike = models.ForeignKey(Bike, on_delete=models.CASCADE, related_name='indoor_bike', blank=True, null=True)
+    outdoor_bike = models.ForeignKey(Bike, on_delete=models.CASCADE, related_name='outdoor_bike', blank=True, null=True)
 
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):

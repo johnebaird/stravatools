@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8" />
+    <title>Stravatools Register Page</title>
+
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+  </head>
+
+  <body>
+    <h1>Register page</h1>
+    <p>To save strava link information permenently create account to save this info</p>
+    <p>Account will also be needed for any functions that run in the background as auto updates of indoor and outdoor bikes and maintenance reminders</p>
+
+  <p> strava auth code is {{ code }}</p>
+
+  {{ form.errors }}
+ 
+  <form method="post" action="{% url 'register' %}">
+    {% csrf_token %}
+  
+    {{ form }}
+
+    <input type="submit" value="register">
+   </form>
+
+  </body>
+</html>
