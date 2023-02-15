@@ -13,8 +13,6 @@
     <p>To save strava link information permenently create account to save this info</p>
     <p>Account will also be needed for any functions that run in the background as auto updates of indoor and outdoor bikes and maintenance reminders</p>
 
-  <p> strava auth code is {{ code }}</p>
-
   {{ form.errors }}
  
   <form method="post" action="{% url 'register' %}">
@@ -24,6 +22,9 @@
 
     <input type="submit" value="register">
    </form>
+
+   <div><a href="{% url 'activities' %}"> I don't want to register for an account</a></div>
+ 
 
   </body>
 </html>

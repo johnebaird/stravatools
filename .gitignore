@@ -8,3 +8,4 @@ target/*
 
 *.pyc
 django/stravatools/db.sqlite3
+django/stravatools/db.sqlite3
