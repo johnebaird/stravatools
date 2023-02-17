@@ -11,7 +11,35 @@
   <body>
     <h1>Activities Page</h1>
 
-    {{ athlete }}
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Distance</th>
+          <th>Type</th>
+          <th>Trainer</th>
+          <th>Start Date</th>
+          <th>Gear ID<th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for a in activities %}    
+        <tr>
+          <td>{{ a.id }}</td>
+          <td>{{ a.name}}</td>
+          <td>{{ a.distance }}</td>
+          <td>{{ a.type }}</td>
+          <td>{{ a.trainer }}</td>
+          <td>{{ a.start_date }}</td>
+          <td>{{ a.gear_id }} <td>
+        </tr>
+          {% endfor %}  
+      </tbody>
+    </table>
+    <br>
+    
+
     
   </body>
 </html>
