@@ -8,6 +8,7 @@ from django.contrib.auth import authenticate, login
 
 from . import stravaapi
 from .models import Bearer, Profile
+from .forms import UpdatableActivity
 
 logger = logging.getLogger(__name__)
 
@@ -22,6 +23,35 @@ def index(request):
 def profile(request):
     return redirect(activities)
     
+def activitydetail(request, id):
+
+    if request.method == 'POST':
+
+        form = UpdatableActivity(request.POST)
+        if form.is_valid():
+            logger.debug("form submit is good")
+    
+    else:
+        if request.user.is_authenticated:
+            stravaapi.refreshBearer(request.user.profile.bearer)
+            bearer = request.user.profile.bearer.access_token
+        else:
+            if 'bearer' in request.session:
+                bearer = request.session['bearer']['access_token']
+            else:
+                return redirect(index)
+    
+        activity = stravaapi.getActivityFromId(bearer, id)
+
+        form = UpdatableActivity(initial={'commute': activity['commute'],
+                   'trainer': activity['trainer'],
+                   'hide_from_home': activity['hide_from_home'], 
+                   'description': activity['description'],
+                   'name': activity['name'],
+                   'sport_type': activity['sport_type']})
+
+    return render(request, 'main/activitydetail.html', {'form': form, 'id': id})
+
 def register(request):
     # redirect to index page if they haven't authed to strava yet
     if 'bearer' not in request.session: 
@@ -54,17 +84,20 @@ def exchange_token(request):
     request.session.modified = True
     return redirect(register)
 
+
 def activities(request):
 
     page = request.GET.get('page', '1')
 
     if request.user.is_authenticated:
         stravaapi.refreshBearer(request.user.profile.bearer)
-        activities = stravaapi.getActivities(request.user.profile.bearer.access_token, page)
+        bearer = request.user.profile.bearer.access_token
     else:
         if 'bearer' in request.session:
-            activities = stravaapi.getActivities(request.session['bearer']['access_token'],page)
+            bearer = request.session['bearer']['access_token']
         else:
             return redirect(index)
+        
+    activities = stravaapi.getActivities(bearer, page)
 
     return render(request, "main/activities.html", context={"activities": activities})

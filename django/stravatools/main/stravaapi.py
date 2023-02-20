@@ -84,7 +84,18 @@ def getActivities(access_token: str, page: int) -> dict:
 
     r = requests.get(stravaurl + "/activities", headers=auth, params=params)
 
-    logger.debug("GET for Activities returned" + r.text)
-
     return json.loads(r.text)
 
+def getActivityFromId(access_token: str, id: int) -> dict:
+    logger.info("Querying for activity" + str(id))
+
+    auth = {"Authorization": "Bearer " + access_token}
+    
+    logger.debug("using access_token: " + str(auth))
+    r = requests.get(stravaurl + "/activities/" + str(id), headers=auth)
+
+    data = json.loads(r.text)
+    del data['map']
+    logger.debug("GET for specific activity returned" + str(data))
+
+    return data

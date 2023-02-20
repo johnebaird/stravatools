@@ -11,4 +11,5 @@ urlpatterns = [
     path ('exchange_token/', views.exchange_token, name='exchange token'),
     # /activities
     path('activities/', views.activities, name='activities'),
+    path('activities/<int:id>', views.activitydetail, name='activitydetail'),
     ]

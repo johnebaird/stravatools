@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8" />
+    <title>Activity Detail</title>
+
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+  </head>
+
+  <body>
+    <h1>Details for activity {{ id }}</h1>
+    
+    {{ form.errors }}
+ 
+    <form method="post" action="{% url 'activitydetail' id %}">
+        {% csrf_token %}
+    
+        {{ form }}
+
+        <input type="submit" value="Update">
+    </form>
+
+   </body>
+</html>
