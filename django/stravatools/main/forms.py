@@ -30,14 +30,6 @@ class UpdatableActivity(forms.Form):
     name = forms.CharField(label='name', max_length=100)
     sport_type = forms.ChoiceField(choices=SportType)
     gear_id = forms.ChoiceField()
-
-    def load_from_activity(self, activity: dict) -> None:
-        self.fields['commute'].clean(activity['commute'])
-        self.fields['trainer'].clean(activity['trainer'])
-        self.fields['hide_from_home'].clean(activity['hide_from_home'])
-        self.fields['description'].clean(activity['description'])
-        self.fields['name'].clean(activity['name'])
-        self.fields['sport_type'].clean(activity['sport_type'])
-        # self.fields['gear_id'].clean(activity['gear_id'])
-
-        
+       
+    def populate_bikes(self, choices):
+        self.fields['gear_id'].choices = choices

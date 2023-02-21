@@ -27,9 +27,23 @@ def activitydetail(request, id):
 
     if request.method == 'POST':
 
-        form = UpdatableActivity(request.POST)
+        form = UpdatableActivity(request.POST, initial=request.session['initial'])
+        
+        # bit hacky but since gear_id choices were set programmatically not statically 
+        # django doesn't have them from request.POST but we do need them to validate
+        form.fields['gear_id'].choices = request.session['bikes']
+        
         if form.is_valid():
             logger.debug("form submit is good")
+
+            update = {}
+            
+            for data in form.changed_data:
+                update[data] = form.cleaned_data[data]
+
+            logger.debug("Updating activity with:" + str(update))
+
+            return redirect(activities)
     
     else:
         if request.user.is_authenticated:
@@ -42,15 +56,29 @@ def activitydetail(request, id):
                 return redirect(index)
     
         activity = stravaapi.getActivityFromId(bearer, id)
+        athlete = stravaapi.getAthlete(bearer)
 
-        form = UpdatableActivity(initial={'commute': activity['commute'],
+        initial = {'commute': activity['commute'],
                    'trainer': activity['trainer'],
                    'hide_from_home': activity['hide_from_home'], 
                    'description': activity['description'],
                    'name': activity['name'],
-                   'sport_type': activity['sport_type']})
+                   'sport_type': activity['sport_type'], 
+                   'gear_id': activity['gear_id']}
 
-    return render(request, 'main/activitydetail.html', {'form': form, 'id': id})
+        form = UpdatableActivity(initial=initial)
+        
+        # make tuples of bike and id for choice object drop down
+        bikechoices = []
+        for b in athlete['bikes']:
+            bikechoices.append((b['id'], b['nickname']))        
+        form.populate_bikes(bikechoices)
+
+        request.session['activity'] = activity
+        request.session['bikes'] = bikechoices
+        request.session['initial'] = initial
+
+    return render(request, 'main/activitydetail.html', {'form': form, 'id': id, 'activity': request.session['activity']})
 
 def register(request):
     # redirect to index page if they haven't authed to strava yet
@@ -99,5 +127,13 @@ def activities(request):
             return redirect(index)
         
     activities = stravaapi.getActivities(bearer, page)
+    athlete = stravaapi.getAthlete(bearer)
+
+    # add gear name along with id to activities dict
+    for bike in athlete['bikes']:
+        for a in activities:
+            if a['gear_id'] == bike['id']:
+                a['gear_name'] = bike['nickname']
+
 
     return render(request, "main/activities.html", context={"activities": activities})

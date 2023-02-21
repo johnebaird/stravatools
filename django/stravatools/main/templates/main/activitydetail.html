@@ -15,8 +15,32 @@
  
     <form method="post" action="{% url 'activitydetail' id %}">
         {% csrf_token %}
-    
-        {{ form }}
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Distance</th>
+              <th>Type</th>
+              <th>Trainer</th>
+              <th>Commute</th>
+              <th>Hide</th>
+              <th>Description</th>
+              <th>Gear<th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>{{ form.name}}</td>
+              <td>{{ activity.distance }}</td>
+              <td>{{ form.sport_type }}</td>
+              <td>{{ form.trainer }}</td>
+              <td>{{ form.commute }}</td>
+              <td>{{ form.hide_from_home }}</td>
+              <td>{{ form.description }}</td>
+              <td>{{ form.gear_id }} </td>
+            </tr>
+          </tbody>
+        </table>
 
         <input type="submit" value="Update">
     </form>

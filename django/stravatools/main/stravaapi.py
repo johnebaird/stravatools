@@ -99,3 +99,15 @@ def getActivityFromId(access_token: str, id: int) -> dict:
     logger.debug("GET for specific activity returned" + str(data))
 
     return data
+
+def getGear(access_token:str) -> dict:
+    logger.info("Querying for gear..")
+
+    auth = {"Authorization": "Bearer " + access_token}
+
+    r = requests.get(stravaurl + "/gear", headers=auth)
+
+    logger.debug("Gear query returns: " + r.text)
+
+    return json.loads(r.text)
+
