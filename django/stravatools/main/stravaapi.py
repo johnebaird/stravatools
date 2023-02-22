@@ -111,3 +111,15 @@ def getGear(access_token:str) -> dict:
 
     return json.loads(r.text)
 
+
+def updateActivity(access_token: str, id:int, data:dict) -> None:
+    logger.info("Updating activity " + str(id))
+    logger.debug(" with: " + str(data))
+
+    auth = {"Authorization": "Bearer " + access_token}
+
+    r = requests.put(stravaurl + "/activities/" + str(id), data=data, headers=auth)
+
+    logger.debug("Activity update PUT returns: " + r.text)
+
+    return

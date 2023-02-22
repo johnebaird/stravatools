@@ -25,6 +25,10 @@ def profile(request):
     
 def activitydetail(request, id):
 
+    if not checkbearer(request): return redirect(index)
+    if not 'athlete' in request.session: 
+        request.session['athlete'] = stravaapi.getAthlete(request.session['access_token'])
+
     if request.method == 'POST':
 
         form = UpdatableActivity(request.POST, initial=request.session['initial'])
@@ -37,45 +41,34 @@ def activitydetail(request, id):
             logger.debug("form submit is good")
 
             update = {}
-            
             for data in form.changed_data:
                 update[data] = form.cleaned_data[data]
 
             logger.debug("Updating activity with:" + str(update))
+            stravaapi.updateActivity(request.session['access_token'], id, update)
 
             return redirect(activities)
     
     else:
-        if request.user.is_authenticated:
-            stravaapi.refreshBearer(request.user.profile.bearer)
-            bearer = request.user.profile.bearer.access_token
-        else:
-            if 'bearer' in request.session:
-                bearer = request.session['bearer']['access_token']
-            else:
-                return redirect(index)
-    
-        activity = stravaapi.getActivityFromId(bearer, id)
-        athlete = stravaapi.getAthlete(bearer)
-
+        activity = stravaapi.getActivityFromId(request.session['access_token'], id)
+        
         initial = {'commute': activity['commute'],
                    'trainer': activity['trainer'],
                    'hide_from_home': activity['hide_from_home'], 
                    'description': activity['description'],
                    'name': activity['name'],
-                   'sport_type': activity['sport_type'], 
                    'gear_id': activity['gear_id']}
 
         form = UpdatableActivity(initial=initial)
         
         # make tuples of bike and id for choice object drop down
         bikechoices = []
-        for b in athlete['bikes']:
+        for b in request.session['athlete']['bikes']:
             bikechoices.append((b['id'], b['nickname']))        
         form.populate_bikes(bikechoices)
-
-        request.session['activity'] = activity
+        
         request.session['bikes'] = bikechoices
+        request.session['activity'] = activity
         request.session['initial'] = initial
 
     return render(request, 'main/activitydetail.html', {'form': form, 'id': id, 'activity': request.session['activity']})
@@ -100,7 +93,6 @@ def register(request):
             del request.session['bearer']
             
             return redirect(activities)
-    
     else:
         form = UserCreationForm()
     
@@ -115,25 +107,33 @@ def exchange_token(request):
 
 def activities(request):
 
+    if not checkbearer(request): return redirect(index)
+    if not 'athlete' in request.session: 
+        request.session['athlete'] = stravaapi.getAthlete(request.session['access_token'])
+
     page = request.GET.get('page', '1')
 
-    if request.user.is_authenticated:
-        stravaapi.refreshBearer(request.user.profile.bearer)
-        bearer = request.user.profile.bearer.access_token
-    else:
-        if 'bearer' in request.session:
-            bearer = request.session['bearer']['access_token']
-        else:
-            return redirect(index)
-        
-    activities = stravaapi.getActivities(bearer, page)
-    athlete = stravaapi.getAthlete(bearer)
+    activities = stravaapi.getActivities(request.session['access_token'], page)
 
     # add gear name along with id to activities dict
-    for bike in athlete['bikes']:
+    for bike in request.session['athlete']['bikes']:
         for a in activities:
             if a['gear_id'] == bike['id']:
                 a['gear_name'] = bike['nickname']
 
-
     return render(request, "main/activities.html", context={"activities": activities})
+
+# check bearer token, populate from user data if user is logged in and set in session
+# otherwise make sure bearer is in session data for users without accounts and if not redirect
+def checkbearer(request) -> bool:
+    if request.user.is_authenticated:
+        stravaapi.refreshBearer(request.user.profile.bearer)
+        request.session['access_token'] = request.user.profile.bearer.access_token
+        request.session.modified = True
+        return True
+    else:
+        if 'bearer' in request.session:
+            request.session['access_token'] = request.session['bearer']['access_token']
+            request.session.modified = True
+            return True
+    return False
