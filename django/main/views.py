@@ -33,7 +33,7 @@ def activitydetail(request, id):
         
         # bit hacky but since gear_id choices were set programmatically not statically 
         # django doesn't have them from request.POST but we do need them to validate
-        form.fields['gear_id'].choices = request.session['bikes']
+        form.fields['gear_id'].choices = request.session['bikechoices']
         
         if form.is_valid():
             logger.debug("form submit is good")
@@ -60,16 +60,20 @@ def activitydetail(request, id):
         form = UpdatableActivity(initial=initial)
         
         # make tuples of bike and id for choice object drop down
-        bikechoices = []
-        for b in request.session['athlete']['bikes']:
-            bikechoices.append((b['id'], b['nickname']))        
-        form.populate_bikes(bikechoices)
-        
-        request.session['bikes'] = bikechoices
+        if 'bikechoices' not in request.session:
+            request.session['bikechoices'] = get_bike_choices(request)
+
         request.session['activity'] = activity
         request.session['initial'] = initial
 
     return render(request, 'main/activitydetail.html', {'form': form, 'id': id, 'activity': request.session['activity']})
+
+
+def get_bike_choices(request):
+    bikechoices = []
+    for b in request.session['athlete']['bikes']:
+        bikechoices.append((b['id'], b['nickname']))        
+    return bikechoices
 
 def register(request):
     # redirect to index page if they haven't authed to strava yet

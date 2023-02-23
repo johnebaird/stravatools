@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from defaultbikes.models import DefaultBike
 
 # Create your models here.
 
@@ -17,23 +18,17 @@ class Bearer(models.Model):
         self.expires_at = int(json['expires_at'])
         self.expires_in = int(json['expires_in'])
         self.refresh_token = json['refresh_token']
-    
-class Bike(models.Model):
-    id = models.CharField(max_length=20, primary_key=True)
-    primary = models.BooleanField(default=False)
-    name = models.CharField(max_length=100)
-    distance = models.IntegerField(blank=True, null=True)
-    brand_name = models.CharField(max_length=100)
-    model_name = models.CharField(max_length=100)
-    description = models.CharField(max_length=200)
+
+    def __str__(self):
+        return str(self.profile) + " - " + self.access_token
     
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    autochange_indoor_bike = models.BooleanField(default=False)
-    autochange_outdoor_bike = models.BooleanField(default=False)
-    bearer = models.ForeignKey(Bearer, on_delete=models.CASCADE, blank=True, null=True)
-    indoor_bike = models.ForeignKey(Bike, on_delete=models.CASCADE, related_name='indoor_bike', blank=True, null=True)
-    outdoor_bike = models.ForeignKey(Bike, on_delete=models.CASCADE, related_name='outdoor_bike', blank=True, null=True)
+    bearer = models.OneToOneField(Bearer, on_delete=models.CASCADE, blank=True, null=True)
+    defaultbikes = models.OneToOneField(DefaultBike, on_delete=models.CASCADE, blank=True, null=True)
+
+    def __str__(self):
+        return self.user.username
 
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):

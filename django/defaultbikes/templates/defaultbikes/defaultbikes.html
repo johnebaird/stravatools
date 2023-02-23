@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8" />
+    <title>Stravatools Default Bikes Tool</title>
+
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+  </head>
+
+  <body>
+    <h1>Default Bikes Page</h1>
+
+    {{ form.errors }}
+
+    <form method="POST" action={% url 'defaultbikes' %}>
+      {% csrf_token %}
+      {{ form }}
+      <input type="submit" value="Update">
+    </form>
+        
+  </body>
+</html>
