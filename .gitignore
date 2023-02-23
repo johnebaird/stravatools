@@ -1,10 +1,13 @@
 
 .vscode/launch.json
-.env
-application.properties
-Test.java
-target/*
 
+.env
+*.png
 *.pyc
+*.jar
+
+springboot/Test.java
+springboot/target/*
+
 django/stravatools/db.sqlite3
-django/stravatools/db.sqlite3
+

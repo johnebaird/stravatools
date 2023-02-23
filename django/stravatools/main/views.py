@@ -26,8 +26,6 @@ def profile(request):
 def activitydetail(request, id):
 
     if not checkbearer(request): return redirect(index)
-    if not 'athlete' in request.session: 
-        request.session['athlete'] = stravaapi.getAthlete(request.session['access_token'])
 
     if request.method == 'POST':
 
@@ -108,8 +106,6 @@ def exchange_token(request):
 def activities(request):
 
     if not checkbearer(request): return redirect(index)
-    if not 'athlete' in request.session: 
-        request.session['athlete'] = stravaapi.getAthlete(request.session['access_token'])
 
     page = request.GET.get('page', '1')
 
@@ -129,11 +125,13 @@ def checkbearer(request) -> bool:
     if request.user.is_authenticated:
         stravaapi.refreshBearer(request.user.profile.bearer)
         request.session['access_token'] = request.user.profile.bearer.access_token
+        if not 'athlete' in request.session: request.session['athlete'] = stravaapi.getAthlete(request.session['access_token'])
         request.session.modified = True
         return True
     else:
         if 'bearer' in request.session:
             request.session['access_token'] = request.session['bearer']['access_token']
+            if not 'athlete' in request.session: request.session['athlete'] = stravaapi.getAthlete(request.session['access_token'])
             request.session.modified = True
             return True
     return False
