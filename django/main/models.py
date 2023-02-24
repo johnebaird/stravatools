@@ -24,8 +24,8 @@ class Bearer(models.Model):
     
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    bearer = models.OneToOneField(Bearer, on_delete=models.CASCADE, blank=True, null=True)
-    defaultbikes = models.OneToOneField(DefaultBike, on_delete=models.CASCADE, blank=True, null=True)
+    bearer = models.OneToOneField(Bearer, on_delete=models.SET_NULL, blank=True, null=True)
+    defaultbikes = models.OneToOneField(DefaultBike, on_delete=models.SET_NULL, blank=True, null=True)
 
     def __str__(self):
         return self.user.username

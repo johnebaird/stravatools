@@ -17,27 +17,32 @@ def defaultbikes(request):
         request.session['bikechoices'] = get_bike_choices(request)
 
     if request.method == 'POST':
-        
-        form = DefaultBikesForm(request.POST)
-        form.fields['indoor_bike'].choices = request.session['bikechoices']
-        form.fields['outdoor_bike'].choices = request.session['bikechoices']
 
-        if form.is_valid():
+        if request.user.profile.defaultbikes:
+            defaultbikesform = DefaultBikesForm(request.POST, 
+                                                instance=request.user.profile.defaultbikes)
+        else:
+            defaultbikesform = DefaultBikesForm(request.POST)
+
+        defaultbikesform.fields['indoor_bike'].choices = request.session['bikechoices']
+        defaultbikesform.fields['outdoor_bike'].choices = request.session['bikechoices']
+
+        if defaultbikesform.is_valid():
             logger.debug("Form is valid")
             
-            request.user.profile.defaultbikes = form.save()
+            request.user.profile.defaultbikes = defaultbikesform.save()
             request.user.profile.defaultbikes.profile = request.user.profile
             
-            request.user.profile.defaultbikes.indoor_bike, created = Bike.objects.get_or_create(id=form.cleaned_data['indoor_bike'])
-            request.user.profile.defaultbikes.outdoor_bike, created = Bike.objects.get_or_create(id=form.cleaned_data['outdoor_bike'])
+            request.user.profile.defaultbikes.indoor_bike, created = Bike.objects.get_or_create(id=defaultbikesform.cleaned_data['indoor_bike'])
+            request.user.profile.defaultbikes.outdoor_bike, created = Bike.objects.get_or_create(id=defaultbikesform.cleaned_data['outdoor_bike'])
 
             del created
 
             for bike in request.session['athlete']['bikes']:
-                if bike['id'] == form.cleaned_data['indoor_bike']:
+                if bike['id'] == defaultbikesform.cleaned_data['indoor_bike']:
                     request.user.profile.defaultbikes.indoor_bike.name = bike['name']
 
-                if bike['id'] == form.cleaned_data['outdoor_bike']:
+                if bike['id'] == defaultbikesform.cleaned_data['outdoor_bike']:
                     request.user.profile.defaultbikes.outdoor_bike.name = bike['name']
 
             request.user.profile.defaultbikes.indoor_bike.save()
@@ -47,9 +52,19 @@ def defaultbikes(request):
             request.user.profile.save()
 
     else:
-        form = DefaultBikesForm(instance=request.user.profile.defaultbikes)
+        if request.user.is_authenticated:
+            if request.user.profile.defaultbikes:
+                defaultbikesform = DefaultBikesForm(instance=request.user.profile.defaultbikes,
+                                    initial={'indoor_bike': request.user.profile.defaultbikes.indoor_bike.id,
+                                             'outdoor_bike': request.user.profile.defaultbikes.outdoor_bike.id})
+            else:
+                defaultbikesform = DefaultBikesForm()
+        else:
+            defaultbikesform = DefaultBikesForm()
+            for fields in defaultbikesform.fields.values():
+                fields.disabled = True
+    
+        defaultbikesform.fields['indoor_bike'].choices = request.session['bikechoices']
+        defaultbikesform.fields['outdoor_bike'].choices = request.session['bikechoices']
 
-        form.fields['indoor_bike'].choices = request.session['bikechoices']
-        form.fields['outdoor_bike'].choices = request.session['bikechoices']
-
-    return render(request, 'defaultbikes/defaultbikes.html', {'form': form})
+    return render(request, 'defaultbikes/defaultbikes.html', {'defaultbikesform': defaultbikesform})
