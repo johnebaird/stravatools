@@ -11,16 +11,27 @@
   <body>
     <h1>Default Bikes Page</h1>
 
-    {{ form.errors }}
+    {{ defaultbikesform.errors }}
+    {{ manualbikecorrectionform.errors }}
 
     <form method="POST" action={% url 'defaultbikes' %}>
       {% csrf_token %}
-      {{ form }}
+      {{ defaultbikesform }}
+      
       {% if user.is_authenticated %}
-        <input type="submit" value="Update">
+        <input type="submit" name='defaultbikes' value="Update">
       {% else %}
         <input type="submit" value="Update" disabled>
       {% endif %}
+    
+    </form>
+
+    <form method="POST" action={% url 'defaultbikes' %}>
+      {% csrf_token %}
+      {{ manualbikecorrectionform }}
+      
+      <input type="submit" name='manualbikecorrection' value="Update">
+   
     </form>
         
   </body>

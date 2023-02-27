@@ -1,7 +1,9 @@
 import logging
 
 from django.shortcuts import render, redirect
-from .forms import DefaultBikesForm
+from django.forms import formset_factory
+
+from .forms import DefaultBikesForm, ManualBikeCorrection
 from .models import DefaultBike, Bike
 from main.views import checkbearer, index, get_bike_choices
 
@@ -13,36 +15,45 @@ def defaultbikes(request):
 
     if not checkbearer(request): return redirect(index)
 
-    if 'bikechoices' not in request.session:
-        request.session['bikechoices'] = get_bike_choices(request)
-
     if request.method == 'POST':
+        if 'defaultbikes' in request.POST:
+            if request.user.profile.defaultbikes:
+                defaultbikesform = DefaultBikesForm(request.user.profile, request.POST, instance=request.user.profile.defaultbikes)
+            else:
+                defaultbikesform = DefaultBikesForm(request.user.profile, request.POST)
 
-        if request.user.profile.defaultbikes:
-            form = DefaultBikesForm(request.user.profile, request.POST, instance=request.user.profile.defaultbikes)
-        else:
-            form = DefaultBikesForm(request.user.profile, request.POST)
+            if defaultbikesform.is_valid():
+                logger.debug("Default Bikes Form is valid")
 
-        if form.is_valid():
-            logger.debug("Form is valid")
+                request.user.profile.defaultbikes = defaultbikesform.save()
+                request.user.profile.save()
 
-            request.user.profile.defaultbikes = form.save()
-            request.user.profile.save()
-            
-            
-    else:
+        if 'manualbikecorrection' in request.POST:
+            manaulbikecorrectionform = ManualBikeCorrection(request.POST)
+            manaulbikecorrectionform.fields['bike'].choices = get_bike_choices(request)
+
+            if manaulbikecorrectionform.is_valid():
+                logger.debug("Manual Bike Correction form is valid")
+
+    try:
+        defaultbikesform
+    except NameError:
         if request.user.is_authenticated:
             updatebikes(request)
             if request.user.profile.defaultbikes:
-                form = DefaultBikesForm(request.user.profile, instance=request.user.profile.defaultbikes)
+                defaultbikesform = DefaultBikesForm(request.user.profile, instance=request.user.profile.defaultbikes)
             else:
-                form = DefaultBikesForm(request.user.profile)
+                defaultbikesform = DefaultBikesForm(request.user.profile)
         else:
-            form = DefaultBikesForm()
-            for fields in form.fields.values():
-                fields.disabled = True
+            defaultbikesform = DefaultBikesForm(None)
+
+    try:
+        manualbikecorrectionform
+    except NameError:
+        manualbikecorrectionform = ManualBikeCorrection()
+        manualbikecorrectionform.fields['bike'].choices = get_bike_choices(request)
     
-    return render(request, 'defaultbikes/defaultbikes.html', {'form': form})
+    return render(request, 'defaultbikes/defaultbikes.html', {'defaultbikesform': defaultbikesform, 'manualbikecorrectionform': manualbikecorrectionform})
 
 
 def updatebikes(request) -> None:
