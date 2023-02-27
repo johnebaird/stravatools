@@ -1,10 +1,12 @@
 from django.db import models
 
+
 # Create your models here.
 
 class Bike(models.Model):
     id = models.CharField(max_length=20, primary_key=True)
     name = models.CharField(max_length=100, blank=True, null=True)
+    profile = models.ForeignKey(to='main.Profile', on_delete=models.CASCADE)
 
     def __str__(self):
         if self.name:
@@ -24,11 +26,4 @@ class DefaultBike(models.Model):
         else:
             return super.__str__
 
-class Logging(models.Model):
-    datetime = models.DateTimeField()
-    defaultbikes = models.ForeignKey(DefaultBike, on_delete=models.CASCADE, blank=True, null=True)
-    message = models.CharField(max_length=500)
-
-    def __str__(self):
-        return f'{self.datetime} - {self.message}'
         

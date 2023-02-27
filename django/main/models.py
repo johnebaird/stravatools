@@ -39,3 +39,11 @@ def create_user_profile(sender, instance, created, **kwargs):
 def save_user_profile(sender, instance, **kwargs):
     instance.profile.save()
     
+class Logging(models.Model):
+    datetime = models.DateTimeField()
+    defaultbikes = models.ForeignKey(Profile, on_delete=models.CASCADE)
+    message = models.CharField(max_length=500)
+
+    def __str__(self):
+        return f'{self.datetime} - {self.message}'
+    
