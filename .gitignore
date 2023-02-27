@@ -10,5 +10,5 @@ springboot/Test.java
 springboot/target/*
 
 db.sqlite3
-migrations/*
+*/migrations/*
 
