@@ -9,5 +9,6 @@
 springboot/Test.java
 springboot/target/*
 
-django/stravatools/db.sqlite3
+db.sqlite3
+migrations/*
 
