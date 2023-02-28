@@ -4,7 +4,9 @@ import logging
 import json
 
 from .models import Bearer
-from datetime import datetime
+from defaultbikes.models import Bike
+
+from datetime import datetime, time, timezone
 
 logger = logging.getLogger(__name__)
 
@@ -25,7 +27,7 @@ def refreshBearer(bearer: Bearer) -> None:
 
     r = requests.post(stravaurl + "/oauth/token", data=payload)
 
-    logger.debug("Post to refresh Bearer token returned: " + r.text)
+    logger.debug("Post to refresh Bearer token returned: %s", r.text)
 
     returned_data = json.loads(r.text)
 
@@ -41,8 +43,8 @@ def getBearerFromCode(code: str) -> Bearer:
     
     logger.info("Querying Strava API for bearer code..")
 
-    logger.debug("Using Strava Client: " + STRAVA_CLIENT_ID)
-    logger.debug("Using Strava Client Secret: " + STRAVA_CLIENT_SECRET)
+    logger.debug("Using Strava Client: %s", STRAVA_CLIENT_ID)
+    logger.debug("Using Strava Client Secret: %s", STRAVA_CLIENT_SECRET)
     
     payload = {'client_id': STRAVA_CLIENT_ID, 
                 'client_secret': STRAVA_CLIENT_SECRET, 
@@ -51,7 +53,7 @@ def getBearerFromCode(code: str) -> Bearer:
 
     r = requests.post(stravaurl + "/oauth/token", data=payload)
 
-    logger.debug("Post for Bearer Code returned: " + r.text)
+    logger.debug("Post for Bearer Code returned: %s", r.text)
 
     returned_data = json.loads(r.text)
 
@@ -66,13 +68,62 @@ def getAthlete(access_token: str) -> str:
 
     auth = {"Authorization" : "Bearer " + access_token}
 
-    logger.debug("using access_token: " + str(auth))
+    logger.debug("using access_token: %s", auth)
 
     r = requests.get(stravaurl + "/athlete", headers=auth)
 
-    logger.debug("GET for Athelete info returned: " + r.text)
+    logger.debug("GET for Athelete info returned: %s", r.text)
 
     return json.loads(r.text)
+
+def changeActivityDateRange(access_token: str, after: datetime, before: datetime, bike: str, change: str) -> None:
+    logger.info("Changing activity for date range")
+
+    # magic datetime stuff
+    before = round(datetime.combine(before, time(0,0,0), tzinfo=timezone.utc).timestamp())
+    after = round(datetime.combine(after, time(23,59,59), tzinfo=timezone.utc).timestamp())
+
+    auth = {"Authorization" : "Bearer " + access_token}
+    params = {"page": 1, 
+              "before": before, 
+              "after": after}
+    
+    while True:
+
+        activities = requests.get(stravaurl + "/athlete/activities", headers=auth, params=params)
+        
+        if activities.status_code == 200:
+            activities = json.loads(activities.text)
+            changeActivitiesPage(access_token, activities, bike, change)
+        else:
+            logger.error("Activity query returned %i %s", activities.status_code, activities.text)
+            break;
+        
+        # should get 30 activities a page, if we get less there are no more pages
+        if len(activities) < 30: break
+
+        # failsafe, shouldn't need to do this many pages
+        if params['page'] == 50: break
+
+        params['page'] += 1
+
+
+        
+def changeActivitiesPage(access_token: str, activities: json, bike: str, change: str) -> None:
+
+    if change == 'indoor':
+        for activity in activities:
+            # any activity with trainer=true or a type of virtual ride is an indoor ride
+            if (activity['trainer'] or activity['sport_type'] == 'VirtualRide') and activity['gear_id'] != bike:
+                logger.info("updating indoor activity %s to bike %s", activity['id'], bike)
+                updateActivity(access_token, int(activity['id']), {'gear_id': bike})
+    
+    if change == 'outdoor':
+        for activity in activities:
+            # outdoor rides should have BOTH trainer=false and sport_type of Ride
+            if (not activity['trainer'] and activity['sport_type'] == 'Ride') and activity['gear_id'] != bike:
+                logger.info("updating outdoor activity %s to bike %s", activity['id'], bike)
+                updateActivity(access_token, int(activity['id']), {'gear_id': bike})
 
 def getActivities(access_token: str, page: int) -> dict:
     logger.info("Querying for athlete activities")
@@ -80,23 +131,23 @@ def getActivities(access_token: str, page: int) -> dict:
     auth = {"Authorization" : "Bearer " + access_token}
     params = {"page": page}
 
-    logger.debug("using access_token: " + str(auth))
+    logger.debug("using access_token: %s", auth)
 
     r = requests.get(stravaurl + "/activities", headers=auth, params=params)
 
     return json.loads(r.text)
 
 def getActivityFromId(access_token: str, id: int) -> dict:
-    logger.info("Querying for activity" + str(id))
+    logger.info("Querying for activity %s", id)
 
     auth = {"Authorization": "Bearer " + access_token}
     
-    logger.debug("using access_token: " + str(auth))
+    logger.debug("using access_token: %s", auth)
     r = requests.get(stravaurl + "/activities/" + str(id), headers=auth)
 
     data = json.loads(r.text)
     del data['map']
-    logger.debug("GET for specific activity returned" + str(data))
+    logger.debug("GET for specific activity returned %s", data)
 
     return data
 
@@ -107,19 +158,18 @@ def getGear(access_token:str) -> dict:
 
     r = requests.get(stravaurl + "/gear", headers=auth)
 
-    logger.debug("Gear query returns: " + r.text)
+    logger.debug("Gear query returns: %s", r.text)
 
     return json.loads(r.text)
 
 
 def updateActivity(access_token: str, id:int, data:dict) -> None:
-    logger.info("Updating activity " + str(id))
-    logger.debug(" with: " + str(data))
+    logger.info("Updating activity %s", id)
+    logger.debug(" with: %s", data)
 
     auth = {"Authorization": "Bearer " + access_token}
 
     r = requests.put(stravaurl + "/activities/" + str(id), data=data, headers=auth)
 
-    logger.debug("Activity update PUT returns: " + r.text)
-
+    logger.debug("Activity update PUT returns: %s", r.status_code)
     return

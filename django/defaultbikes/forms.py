@@ -23,23 +23,24 @@ class DateInput(forms.DateInput):
 
 def date_not_in_future(value):
     if value > datetime.now().date():
-        raise forms.ValidationError('Invalid value', code='invalid')
+        raise forms.ValidationError('Value cannot be in future', code='invalid')
     return value
 
 class ManualBikeCorrection(forms.Form):
-    fromdate = forms.DateField(widget=DateInput(), validators=[date_not_in_future])
-    todate = forms.DateField(widget=DateInput(), validators=[date_not_in_future])
-    activities = forms.ChoiceField(choices=(("indoor", "Indoor"), ('outdoor',"Outdoor")))
+    after = forms.DateField(widget=DateInput(), validators=[date_not_in_future])
+    before = forms.DateField(widget=DateInput(), validators=[date_not_in_future])
+    activitytype = forms.ChoiceField(choices=(("indoor", "Indoor"), ('outdoor',"Outdoor")))
     bike = forms.ChoiceField()
 
     def clean(self):
         cleaned_data = super().clean()
 
-        fromdate = cleaned_data.get("fromdate")
-        todate = cleaned_data.get("todate")
-        
-        if fromdate and todate and fromdate < todate:
-            msg = 'From Date must be before To Date'
-            self.add_error('fromdate', msg)
-            self.add_error('todate', msg)
+        after = cleaned_data.get("after")
+        before = cleaned_data.get("before")
+
+        # want > not >= since before=after works to target a single day        
+        if after and before and after > before:
+            msg = 'From date must be before to date'
+            self.add_error('after', msg)
+            self.add_error('before', msg)
 

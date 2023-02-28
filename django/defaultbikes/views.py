@@ -6,6 +6,7 @@ from django.forms import formset_factory
 from .forms import DefaultBikesForm, ManualBikeCorrection
 from .models import DefaultBike, Bike
 from main.views import checkbearer, index, get_bike_choices
+from main import stravaapi
 
 logger = logging.getLogger(__name__)
 
@@ -29,12 +30,18 @@ def defaultbikes(request):
                 request.user.profile.save()
 
         if 'manualbikecorrection' in request.POST:
-            manaulbikecorrectionform = ManualBikeCorrection(request.POST)
-            manaulbikecorrectionform.fields['bike'].choices = get_bike_choices(request)
+            manualbikecorrectionform = ManualBikeCorrection(request.POST)
+            manualbikecorrectionform.fields['bike'].choices = get_bike_choices(request)
 
-            if manaulbikecorrectionform.is_valid():
+            if manualbikecorrectionform.is_valid():
                 logger.debug("Manual Bike Correction form is valid")
 
+                stravaapi.changeActivityDateRange(request.session['access_token'], 
+                                                  after=manualbikecorrectionform.cleaned_data['after'],
+                                                  before=manualbikecorrectionform.cleaned_data['before'], 
+                                                  bike=manualbikecorrectionform.cleaned_data['bike'], 
+                                                  change=manualbikecorrectionform.cleaned_data['activitytype'])
+                
     try:
         defaultbikesform
     except NameError:

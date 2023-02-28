@@ -12,7 +12,6 @@
     <h1>Default Bikes Page</h1>
 
     {{ defaultbikesform.errors }}
-    {{ manualbikecorrectionform.errors }}
 
     <form method="POST" action={% url 'defaultbikes' %}>
       {% csrf_token %}
