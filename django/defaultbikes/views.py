@@ -15,6 +15,8 @@ logger = logging.getLogger(__name__)
 def defaultbikes(request):
 
     if not checkbearer(request): return redirect(index)
+    
+    results = []
 
     if request.method == 'POST':
         if 'defaultbikes' in request.POST:
@@ -36,10 +38,15 @@ def defaultbikes(request):
             if manualbikecorrectionform.is_valid():
                 logger.debug("Manual Bike Correction form is valid")
 
-                stravaapi.changeActivityDateRange(request.session['access_token'], 
+                bikedata = {}
+                for bike in request.session['athlete']['bikes']:
+                    if manualbikecorrectionform.cleaned_data['bike'] == bike['id']:
+                        bikedata = bike
+
+                results = stravaapi.changeActivityDateRange(request.session['access_token'], 
                                                   after=manualbikecorrectionform.cleaned_data['after'],
                                                   before=manualbikecorrectionform.cleaned_data['before'], 
-                                                  bike=manualbikecorrectionform.cleaned_data['bike'], 
+                                                  bike=bikedata, 
                                                   change=manualbikecorrectionform.cleaned_data['activitytype'])
                 
     try:
@@ -60,7 +67,7 @@ def defaultbikes(request):
         manualbikecorrectionform = ManualBikeCorrection()
         manualbikecorrectionform.fields['bike'].choices = get_bike_choices(request)
     
-    return render(request, 'defaultbikes/defaultbikes.html', {'defaultbikesform': defaultbikesform, 'manualbikecorrectionform': manualbikecorrectionform})
+    return render(request, 'defaultbikes/defaultbikes.html', {'defaultbikesform': defaultbikesform, 'manualbikecorrectionform': manualbikecorrectionform, 'results': results})
 
 
 def updatebikes(request) -> None:

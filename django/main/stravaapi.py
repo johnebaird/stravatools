@@ -76,8 +76,11 @@ def getAthlete(access_token: str) -> str:
 
     return json.loads(r.text)
 
-def changeActivityDateRange(access_token: str, after: datetime, before: datetime, bike: str, change: str) -> None:
+def changeActivityDateRange(access_token: str, after: datetime, before: datetime, bike: dict, change: str) -> list:
     logger.info("Changing activity for date range")
+
+    results = []
+    results.append("Querying strava for activities between " + str(after) + " and " + str(before))
 
     # magic datetime stuff
     before = round(datetime.combine(before, time(0,0,0), tzinfo=timezone.utc).timestamp())
@@ -94,36 +97,55 @@ def changeActivityDateRange(access_token: str, after: datetime, before: datetime
         
         if activities.status_code == 200:
             activities = json.loads(activities.text)
-            changeActivitiesPage(access_token, activities, bike, change)
+            results.append("checking " + str(len(activities)) + " activities on page " + str(params['page']))
+            pageresults = changeActivitiesPage(access_token, activities, bike, change)
+            results = results + pageresults
+            results.append("changed " + str(len(pageresults)) + " activities on page " + str(params['page']))
         else:
             logger.error("Activity query returned %i %s", activities.status_code, activities.text)
+            results.append("activity query returned error")
             break;
         
         # should get 30 activities a page, if we get less there are no more pages
-        if len(activities) < 30: break
+        if len(activities) < 30: 
+            results.append("checked all activities")
+            break
 
         # failsafe, shouldn't need to do this many pages
         if params['page'] == 50: break
 
         params['page'] += 1
+        
+    
+    return results
 
 
         
-def changeActivitiesPage(access_token: str, activities: json, bike: str, change: str) -> None:
+def changeActivitiesPage(access_token: str, activities: json, bike: dict, change: str) -> list:
 
+    results = []
     if change == 'indoor':
         for activity in activities:
-            # any activity with trainer=true or a type of virtual ride is an indoor ride
-            if (activity['trainer'] or activity['sport_type'] == 'VirtualRide') and activity['gear_id'] != bike:
-                logger.info("updating indoor activity %s to bike %s", activity['id'], bike)
-                updateActivity(access_token, int(activity['id']), {'gear_id': bike})
+            # any activity with trainer=true (and is a Ride or VirtualRide) or a type of VirtualRide is an indoor ride
+            if (activity['trainer'] and (activity['sport_type'] == 'Ride' or activity['sport_type'] == 'VirtualRide')) \
+                or activity['sport_type'] == 'VirtualRide':
+                            
+                if activity['gear_id'] != bike['id']:
+                    logger.info("updating indoor activity %s to bike %s", activity['id'], bike['name'])
+                    results.append("Updating activity " + str(activity['id']) + " to bike " + bike['name'])
+                    updateActivity(access_token, int(activity['id']), {'gear_id': bike['id']})
     
     if change == 'outdoor':
         for activity in activities:
             # outdoor rides should have BOTH trainer=false and sport_type of Ride
-            if (not activity['trainer'] and activity['sport_type'] == 'Ride') and activity['gear_id'] != bike:
-                logger.info("updating outdoor activity %s to bike %s", activity['id'], bike)
-                updateActivity(access_token, int(activity['id']), {'gear_id': bike})
+            if (not activity['trainer'] and activity['sport_type'] == 'Ride'):
+                
+                if activity['gear_id'] != bike['id']:
+                    logger.info("updating outdoor activity %s to bike %s", activity['id'], bike['name'])
+                    results.append("Updating activity " + str(activity['id']) + " to bike " + bike['name'])
+                    updateActivity(access_token, int(activity['id']), {'gear_id': bike['id']})
+    
+    return results
 
 def getActivities(access_token: str, page: int) -> dict:
     logger.info("Querying for athlete activities")
