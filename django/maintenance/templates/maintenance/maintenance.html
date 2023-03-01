@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8" />
+    <title>Stravatools Maintenance Reminder Page</title>
+
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+  </head>
+
+  <body>
+    <h1>Maintenance Reminder Page</h1>
+
+    <form method='POST' action={% url 'maintenance' %}>
+      {% csrf_token %}
+      
+      {{ formset.management_form }}
+
+      {% for form in formset %}
+      <p> {{ form }} </p> 
+      
+      {% endfor%}
+
+      <input type='submit' value="Update">
+    </form>
+
+  </body>
+</html>
