@@ -55,6 +55,8 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'stravatools.urls'
 
+EMAIL_BACKEND = 'maintenance.sendgrid.SendGrid'
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',

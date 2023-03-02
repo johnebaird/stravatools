@@ -4,7 +4,9 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.forms import modelformset_factory
 
-from main.views import checkbearer, index
+from main.utils import checkbearer
+from main.views import index
+
 from .models import Muting
 from .forms import MutingForm, MutingFormSet
 

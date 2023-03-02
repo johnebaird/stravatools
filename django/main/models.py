@@ -50,6 +50,7 @@ class Bike(models.Model):
     id = models.CharField(max_length=20, primary_key=True)
     name = models.CharField(max_length=100, blank=True, null=True)
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
+    distance = models.IntegerField(default=0)
 
     def __str__(self):
         if self.name:

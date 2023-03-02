@@ -25,4 +25,11 @@ class Muting(models.Model):
     activitytype = models.CharField(max_length=40, choices=SportType)
     duration = models.IntegerField(blank=True, null=True)
     muteall = models.BooleanField()
+    lastupdatedactivity = models.IntegerField(blank=True, null=True)
+
+    def __str__(self):
+        if self.muteall:
+            return f"{self.profile} all {self.activitytype}"
+        else:
+            return f"{self.profile} <{self.duration} {self.activitytype}"
 

@@ -9,13 +9,14 @@ from django.contrib.auth import authenticate, login
 from . import stravaapi
 from .models import Bearer, Profile
 from .forms import UpdatableActivity
+from .utils import checkbearer, get_bike_choices
 
 logger = logging.getLogger(__name__)
 
 # Create your views here.
 
 def index(request):
-    if request.user.is_authenticated:
+    if request.user.is_authenticated and request.user.profile.bearer:
         return redirect(activities)
     else:
         return render(request, 'main/index.html')
@@ -72,12 +73,6 @@ def activitydetail(request, id):
     return render(request, 'main/activitydetail.html', {'form': form, 'id': id, 'activity': request.session['activity']})
 
 
-def get_bike_choices(request):
-    bikechoices = []
-    for b in request.session['athlete']['bikes']:
-        bikechoices.append((b['id'], b['nickname']))        
-    return bikechoices
-
 def register(request):
     # redirect to index page if they haven't authed to strava yet
     if 'bearer' not in request.session: 
@@ -126,19 +121,3 @@ def activities(request):
 
     return render(request, "main/activities.html", context={"activities": activities})
 
-# check bearer token, populate from user data if user is logged in and set in session
-# otherwise make sure bearer is in session data for users without accounts and if not redirect
-def checkbearer(request) -> bool:
-    if request.user.is_authenticated:
-        stravaapi.refreshBearer(request.user.profile.bearer)
-        request.session['access_token'] = request.user.profile.bearer.access_token
-        if not 'athlete' in request.session: request.session['athlete'] = stravaapi.getAthlete(request.session['access_token'])
-        request.session.modified = True
-        return True
-    else:
-        if 'bearer' in request.session:
-            request.session['access_token'] = request.session['bearer']['access_token']
-            if not 'athlete' in request.session: request.session['athlete'] = stravaapi.getAthlete(request.session['access_token'])
-            request.session.modified = True
-            return True
-    return False

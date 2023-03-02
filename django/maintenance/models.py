@@ -10,4 +10,7 @@ class Reminder(models.Model):
     email = models.EmailField()
     message = models.CharField(max_length=500)
     every = models.IntegerField()
-    last_sent = models.IntegerField(blank=True, null=True)
+    last_sent = models.IntegerField()
+
+    def __str__(self):
+        return f"{self.profile} {self.bike.name} {self.every}k : {self.message}"

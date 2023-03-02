@@ -5,7 +5,8 @@ from django.forms import formset_factory
 
 from .forms import DefaultBikesForm, ManualBikeCorrection
 from .models import DefaultBike, Bike
-from main.views import checkbearer, index, get_bike_choices
+from main.utils import checkbearer, get_bike_choices
+from main.views import index
 from main import stravaapi
 
 logger = logging.getLogger(__name__)
@@ -75,4 +76,7 @@ def updatebikes(request) -> None:
         return
     
     for bike in request.session['athlete']['bikes']:
-        Bike.objects.update_or_create(id=bike['id'], defaults={'name':bike['name'], 'profile':request.user.profile})
+        Bike.objects.update_or_create(id=bike['id'], defaults={'name' : bike['name'], 
+                                                               'distance' : bike['distance'],
+                                                               'profile':request.user.profile})
+        
