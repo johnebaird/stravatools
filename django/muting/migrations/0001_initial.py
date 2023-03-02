@@ -14,14 +14,12 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='Reminder',
+            name='Muting',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('email', models.EmailField(max_length=254)),
-                ('message', models.CharField(max_length=500)),
-                ('every', models.IntegerField()),
-                ('last_sent', models.IntegerField(blank=True, null=True)),
-                ('bike', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='main.bike')),
+                ('activitytype', models.CharField(max_length=100)),
+                ('duration', models.IntegerField(blank=True, null=True)),
+                ('muteall', models.BooleanField(blank=True, null=True)),
                 ('profile', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='main.profile')),
             ],
         ),

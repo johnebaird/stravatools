@@ -1,13 +1,17 @@
+import logging
+
 from django.shortcuts import render, redirect
 from django.forms import modelformset_factory
 from django.contrib.auth.decorators import login_required
 
-from main.views import checkbearer, index, get_bike_choices
+from main.views import checkbearer, index
 
 from .models import Reminder
 from .forms import ReminderForm, ReminderFormSet
 
 # Create your views here.
+
+logger = logging.getLogger(__name__)
 
 @login_required
 def maintenance(request):
@@ -19,6 +23,7 @@ def maintenance(request):
     if request.method == 'POST':
         formset = MaintenanceFormSet(request.user.profile, request.POST, request.FILES)
         if formset.is_valid():
+             logger.debug("maintenance formset is valid")
              formset.save()
              formset = MaintenanceFormSet(request.user.profile)
 

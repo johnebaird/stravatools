@@ -1,6 +1,6 @@
 from django.forms import ModelForm, BaseModelFormSet
 from .models import Reminder
-from defaultbikes.models import Bike
+from main.models import Bike
 
 class ReminderFormSet(BaseModelFormSet):
     def __init__(self, profile, *args, **kwargs):

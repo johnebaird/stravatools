@@ -32,7 +32,7 @@ def activitydetail(request, id):
         form = UpdatableActivity(request.POST, initial=request.session['initial'])
         
         # bit hacky but since gear_id choices were set programmatically not statically 
-        # django doesn't have them from request.POST but we do need them to validate
+        # django doesn't have them from request.POST but we to add them again to validate
         form.fields['gear_id'].choices = request.session['bikechoices']
         
         if form.is_valid():
@@ -59,9 +59,12 @@ def activitydetail(request, id):
 
         form = UpdatableActivity(initial=initial)
         
+        
         # make tuples of bike and id for choice object drop down
         if 'bikechoices' not in request.session:
             request.session['bikechoices'] = get_bike_choices(request)
+
+        form.fields['gear_id'].choices = request.session['bikechoices']
 
         request.session['activity'] = activity
         request.session['initial'] = initial

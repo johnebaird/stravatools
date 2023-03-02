@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     'main.apps.MainConfig',
     'defaultbikes.apps.DefaultbikesConfig',
     'maintenance.apps.MaintenanceConfig',
+    'muting.apps.MutingConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

@@ -1,6 +1,7 @@
 from django.apps import AppConfig
 import os
 import logging
+import sys
 
 logger = logging.getLogger(__name__)
 
@@ -9,12 +10,15 @@ class MainConfig(AppConfig):
     name = 'main'
 
     def ready(self):
-        if 'STRAVA_CLIENT_ID' not in os.environ:
-            logger.error("STRAVA_CLIENT_ID environment variable needs to be set")
-            exit()
-        
-        if 'STRAVA_CLIENT_SECRET' not in os.environ:
-            logger.error("STRAVA_CLIENT_SECRET environment variable needs to be set")
-            exit()
+
+        # don't need to check for this if running makemigrations, migrate, etc..
+        if 'runserver' in sys.argv:
+            if 'STRAVA_CLIENT_ID' not in os.environ:
+                logger.error("STRAVA_CLIENT_ID environment variable needs to be set")
+                exit()
+            
+            if 'STRAVA_CLIENT_SECRET' not in os.environ:
+                logger.error("STRAVA_CLIENT_SECRET environment variable needs to be set")
+                exit()
 
             

@@ -4,7 +4,7 @@ import logging
 import json
 
 from .models import Bearer
-from defaultbikes.models import Bike
+from main.models import Bike
 
 from datetime import datetime, time, timezone
 

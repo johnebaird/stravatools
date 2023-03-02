@@ -1,6 +1,6 @@
 from django.db import models
 from main.models import Profile
-from defaultbikes.models import Bike
+from main.models import Bike
 
 # Create your models here.
 

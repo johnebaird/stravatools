@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8" />
+    <title>Stravatools Activity Muting</title>
+
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+  </head>
+
+  <body>
+    <h1>Activity Muting</h1>
+
+    <form method='POST' action={% url 'muting' %}>
+      {% csrf_token %}
+      
+      {{ formset.management_form }}
+
+      {% for form in formset %}
+      <p> {{ form }} </p> 
+      {% endfor%}
+
+      <input type='submit' value="Update">
+    </form>
+
+  </body>
+</html>

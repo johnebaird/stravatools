@@ -1,18 +1,7 @@
 from django.db import models
-
+from main.models import Bike
 
 # Create your models here.
-
-class Bike(models.Model):
-    id = models.CharField(max_length=20, primary_key=True)
-    name = models.CharField(max_length=100, blank=True, null=True)
-    profile = models.ForeignKey(to='main.Profile', on_delete=models.CASCADE)
-
-    def __str__(self):
-        if self.name:
-            return f'{self.id} - {self.name}'
-        return self.id
-
 
 class DefaultBike(models.Model):
     autochange_indoor_bike = models.BooleanField(default=False)
