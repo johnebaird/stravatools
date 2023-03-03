@@ -2,9 +2,11 @@ import logging
 
 from django.core.management.base import BaseCommand
 from django.core.mail import send_mail
+from django.utils import timezone
 
 from maintenance.models import Reminder
 from main import stravaapi
+from main.models import Logging
 
 logger = logging.getLogger(__name__)
 
@@ -15,21 +17,18 @@ class Command(BaseCommand):
     def handle(self, *args, **kwargs):
         logger.info("running bike maintenance email check")
 
-        reminders = Reminder.objects.all()
-
-        athletes = {}
-        
+        reminders = Reminder.objects.all().order_by('profile')
+        current_profile = None
+                
         for rem in reminders:
 
-            stravaapi.refreshBearer(rem.profile.bearer)
-            access_token = rem.profile.bearer.access_token
-            
-            # save data from athelete since we could have multiple reminders for same
-            # don't want to query API each time
-            if access_token not in athletes:
-                athletes[access_token] = stravaapi.getAthlete(access_token)
+            if current_profile != rem.profile:
+                stravaapi.refreshBearer(rem.profile.bearer)
+                access_token = rem.profile.bearer.access_token
+                athlete = stravaapi.getAthlete(access_token)
+                current_profile = rem.profile
 
-            for bike in athletes[access_token]['bikes']:
+            for bike in athlete['bikes']:
                 if bike['id'] == rem.bike.id and bike['distance'] > rem.last_sent + (rem.every * 1000):
                     subject = bike['name'] + " at " + str(round(bike['distance'] / 1000)) + "k" + rem.message
                     sent = send_mail(subject,
@@ -41,6 +40,10 @@ class Command(BaseCommand):
                     if sent:
                         rem.last_sent = bike['distance']
                         rem.save()
+                        Logging.objects.create(datetime=timezone.now(), profile=rem.profile, 
+                                               message="Sent maintenance email to " + str(rem.email) + ": " + subject + " " + rem.message,
+                                               application='maintenance')
+                        
 
 
 

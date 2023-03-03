@@ -6,6 +6,7 @@ from django.contrib.auth.decorators import login_required
 
 from main.views import index
 from main.utils import checkbearer
+from main.models import Logging
 
 from .models import Reminder
 from .forms import ReminderForm, ReminderFormSet
@@ -18,6 +19,7 @@ logger = logging.getLogger(__name__)
 def maintenance(request):
 
     if not checkbearer(request): return redirect(index)
+    changelog = Logging.objects.filter(profile=request.user.profile, application='maintenance').order_by('datetime')[:10]
     
     MaintenanceFormSet = modelformset_factory(Reminder, formset=ReminderFormSet, form=ReminderForm, extra=1, can_delete=True)
 
@@ -38,4 +40,4 @@ def maintenance(request):
         formset = MaintenanceFormSet(request.user.profile)
         
           
-    return render(request, 'maintenance/maintenance.html', {'formset': formset})
+    return render(request, 'maintenance/maintenance.html', {'formset': formset, 'changelog': changelog})

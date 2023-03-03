@@ -26,7 +26,11 @@
       <tbody>
         {% for a in activities %}    
         <tr>
-          <td><a href="{% url 'activitydetail' a.id %}">{{ a.id }}</a></td>
+          {% if stravawrite %}
+            <td><a href="{% url 'activitydetail' a.id %}">{{ a.id }}</a></td>
+          {% else %}
+            <td>{{ a.id }}</td>
+          {% endif %}
           <td>{{ a.name}}</td>
           <td>{{ a.distance }}</td>
           <td>{{ a.type }}</td>

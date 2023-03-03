@@ -21,6 +21,11 @@
       {% endfor%}
 
       <input type='submit' value="Update">
+
+      {% for log in changelog %}
+      <p> {{ log }} <p>
+      {% endfor %}
+      
     </form>
 
   </body>

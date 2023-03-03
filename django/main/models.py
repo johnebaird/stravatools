@@ -37,14 +37,21 @@ def create_user_profile(sender, instance, created, **kwargs):
 @receiver(post_save, sender=User)    
 def save_user_profile(sender, instance, **kwargs):
     instance.profile.save()
-    
+
+
 class Logging(models.Model):
+
+    # seperate out which task is logging
+    appchoices = [('main', 'main'),('autobikechange', 'autobikechange'),('muting','muting'),('maintenance','maintenance')]
+    
     datetime = models.DateTimeField()
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
+    application = models.CharField(max_length=25, choices=appchoices, default='main')
     message = models.CharField(max_length=500)
 
     def __str__(self):
-        return f'{self.datetime} - {self.message}'
+        time = self.datetime.strftime("%x %X")
+        return f'{time} - {self.application} : {self.message}'
     
 class Bike(models.Model):
     id = models.CharField(max_length=20, primary_key=True)

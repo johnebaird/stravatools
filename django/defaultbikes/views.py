@@ -6,7 +6,8 @@ from django.forms import formset_factory
 from .forms import DefaultBikesForm, ManualBikeCorrection
 from .models import DefaultBike, Bike
 from main.utils import checkbearer, get_bike_choices
-from main.views import index
+from main.views import index, activities
+from main.models import Logging
 from main import stravaapi
 
 logger = logging.getLogger(__name__)
@@ -16,9 +17,11 @@ logger = logging.getLogger(__name__)
 def defaultbikes(request):
 
     if not checkbearer(request): return redirect(index)
+    if not request.session['stravawrite']: return redirect(activities)
     
     results = []
-
+    changelog = {}
+    
     if request.method == 'POST':
         if 'defaultbikes' in request.POST:
             if request.user.profile.defaultbikes:
@@ -57,6 +60,8 @@ def defaultbikes(request):
             updatebikes(request)
             if request.user.profile.defaultbikes:
                 defaultbikesform = DefaultBikesForm(request.user.profile, instance=request.user.profile.defaultbikes)
+                changelog = Logging.objects.filter(profile=request.user.profile, application='autobikechange')\
+                                            .order_by('datetime')[:10]
             else:
                 defaultbikesform = DefaultBikesForm(request.user.profile)
         else:
@@ -68,7 +73,10 @@ def defaultbikes(request):
         manualbikecorrectionform = ManualBikeCorrection()
         manualbikecorrectionform.fields['bike'].choices = get_bike_choices(request)
     
-    return render(request, 'defaultbikes/defaultbikes.html', {'defaultbikesform': defaultbikesform, 'manualbikecorrectionform': manualbikecorrectionform, 'results': results})
+    return render(request, 'defaultbikes/defaultbikes.html', {'defaultbikesform': defaultbikesform, 
+                                                              'manualbikecorrectionform': manualbikecorrectionform, 
+                                                              'results': results, 
+                                                              'changelog': changelog})
 
 
 def updatebikes(request) -> None:

@@ -33,7 +33,9 @@ class Command(BaseCommand):
                 logging += stravaapi.changeActivitiesPage(access_token, activities, bike, "outdoor")
 
             for logentry in logging:
-                    Logging.objects.create(datetime=timezone.now(), profile=changes.profile, message=logentry)
+                    Logging.objects.create(datetime=timezone.now(), application='autobikechange', profile=changes.profile, message=logentry)
             
-            Logging.objects.create(datetime=timezone.now(), profile=changes.profile, message="Bike Autochange task ran and changed " + str(len(logging)) + "bikes")
+            Logging.objects.create(datetime=timezone.now(), profile=changes.profile, 
+                                   message="Bike Autochange task ran and changed " + str(len(logging)) + "bikes",
+                                   application='autobikechange')
 

@@ -33,6 +33,10 @@
    
     </form>
 
+    {% for log in changelog %}
+    <p> {{ log }} <p>
+    {% endfor %}
+
     {% for r in results %}
       <p> {{ r }} </p>
     {% endfor %}

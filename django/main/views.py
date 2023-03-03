@@ -27,7 +27,8 @@ def profile(request):
 def activitydetail(request, id):
 
     if not checkbearer(request): return redirect(index)
-
+    if not request.session['stravawrite']: return redirect(activities)
+    
     if request.method == 'POST':
 
         form = UpdatableActivity(request.POST, initial=request.session['initial'])
@@ -87,6 +88,7 @@ def register(request):
 
             user.profile.bearer = Bearer()
             user.profile.bearer.load_json(request.session['bearer'])
+            user.profile.bearer.write_access = request.session['stravawrite']
             user.profile.bearer.save()
             user.profile.save()
             
@@ -100,7 +102,15 @@ def register(request):
     
 
 def exchange_token(request):
+    # need at least read access
+    if 'activity:read_all' not in request.GET['scope'] or 'profile:read_all' not in request.GET['scope']:
+        redirect(index)
+
     request.session['bearer'] = stravaapi.getBearerFromCode(request.GET['code'])
+    
+    # we don't have write access to activities
+    request.session['stravawrite'] = 'activity:write' in request.GET['scope']
+
     request.session.modified = True
     return redirect(register)
 
@@ -119,5 +129,5 @@ def activities(request):
             if a['gear_id'] == bike['id']:
                 a['gear_name'] = bike['nickname']
 
-    return render(request, "main/activities.html", context={"activities": activities})
+    return render(request, "main/activities.html", context={"activities": activities, 'stravawrite': request.session['stravawrite']})
 
