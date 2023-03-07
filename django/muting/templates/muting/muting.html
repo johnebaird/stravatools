@@ -1,14 +1,8 @@
-<!DOCTYPE html>
-<html lang="en-US">
-  <head>
-    <meta charset="utf-8" />
-    <title>Stravatools Activity Muting</title>
+{% extends "base.html" %}
 
-    {% load static %}
-    <link rel="stylesheet" href="{% static 'style.css' %}">
-  </head>
+{% block title %}Stravatools Activity Muting Tool{% endblock %}
 
-  <body>
+{% block content %}
     <h1>Activity Muting</h1>
 
     <form method='POST' action={% url 'muting' %}>
@@ -28,5 +22,4 @@
       
     </form>
 
-  </body>
-</html>
+{% endblock %}

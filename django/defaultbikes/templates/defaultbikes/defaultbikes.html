@@ -1,14 +1,9 @@
-<!DOCTYPE html>
-<html lang="en-US">
-  <head>
-    <meta charset="utf-8" />
-    <title>Stravatools Default Bikes Tool</title>
+{% extends "base.html" %}
 
-    {% load static %}
-    <link rel="stylesheet" href="{% static 'style.css' %}">
-  </head>
+{% block title %}Stravatools Default Bike tool{% endblock %}
 
-  <body>
+{% block content %}
+
     <h1>Default Bikes Page</h1>
 
     {{ defaultbikesform.errors }}
@@ -41,5 +36,4 @@
       <p> {{ r }} </p>
     {% endfor %}
     
-  </body>
-</html>
+{% endblock %}

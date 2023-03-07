@@ -1,14 +1,8 @@
-<!DOCTYPE html>
-<html lang="en-US">
-  <head>
-    <meta charset="utf-8" />
-    <title>Stravatools Maintenance Reminder Page</title>
+{% extends "base.html" %}
 
-    {% load static %}
-    <link rel="stylesheet" href="{% static 'style.css' %}">
-  </head>
+{% block title %}Stravatools Maintenance Reminder Tool{% endblock %}
 
-  <body>
+{% block content %}
     <h1>Maintenance Reminder Page</h1>
 
     <form method='POST' action={% url 'maintenance' %}>
@@ -28,5 +22,4 @@
     <p> {{ log }} <p>
     {% endfor %}
 
-  </body>
-</html>
+{% endblock %}

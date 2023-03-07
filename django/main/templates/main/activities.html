@@ -1,14 +1,8 @@
-<!DOCTYPE html>
-<html lang="en-US">
-  <head>
-    <meta charset="utf-8" />
-    <title>Stravatools Activities</title>
+{% extends "base.html" %}
 
-    {% load static %}
-    <link rel="stylesheet" href="{% static 'style.css' %}">
-  </head>
+{% block title %}Stravatools Activity Page{% endblock %}
 
-  <body>
+{% block content %}
     <h1>Activities Page</h1>
 
     <table>
@@ -42,8 +36,5 @@
       </tbody>
     </table>
     <br>
-    
-
-    
-  </body>
-</html>
+     
+    {% endblock %}
