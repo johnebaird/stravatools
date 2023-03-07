@@ -1,12 +1,8 @@
-<!DOCTYPE html>
-<html lang="en-US">
-  <head>
-    <meta charset="utf-8" />
-    <title>Stravatools Register Page</title>
+{% extends "base.html" %}
 
-    {% load static %}
-    <link rel="stylesheet" href="{% static 'style.css' %}">
-  </head>
+{% block title %}Stravatools{% endblock %}
+
+{% block content %}
 
   <body>
     <h1>Register page</h1>
@@ -23,8 +19,7 @@
     <input type="submit" value="register">
    </form>
 
-   <div><a href="{% url 'activities' %}"> I don't want to register for an account</a></div>
+   <div><a href="{% url 'activities' %}"> Continue without an account</a></div>
  
 
-  </body>
-</html>
+{% endblock %}

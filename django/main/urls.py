@@ -5,11 +5,9 @@ from . import views
 urlpatterns = [
     # / 
     path('', views.index, name='index'), 
-    # /register
-    path ('register/', views.register, name='register'),
-    # /exchange_token
-    path ('exchange_token/', views.exchange_token, name='exchange token'),
-    # /activities
+    path ('accounts/register/', views.register, name='register'),
+    path ('accounts/profile', views.profile, name='profile'),
+    path ('exchange_token/', views.exchange_token, name='exchange_token'),
     path('activities/', views.activities, name='activities'),
     path('activities/<int:id>', views.activitydetail, name='activitydetail'),
     ]

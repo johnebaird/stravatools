@@ -19,7 +19,11 @@ class Command(BaseCommand):
         bikechanges = DefaultBike.objects.filter(autochange_indoor_bike=True) | DefaultBike.objects.filter(autochange_outdoor_bike=True)
 
         for changes in bikechanges:
-            stravaapi.refreshBearer(changes.profile.bearer)
+            newbearer = stravaapi.refreshBearer(changes.profile.bearer.expires_at, changes.profile.bearer.refresh_token)
+            if newbearer:
+                 changes.profile.bearer.load_json(newbearer)
+                 changes.profile.bearer.save()
+                                  
             access_token = changes.profile.bearer.access_token
             activities = stravaapi.getActivities(access_token, 1)
             logging = []

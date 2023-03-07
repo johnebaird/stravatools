@@ -15,15 +15,15 @@ STRAVA_CLIENT_SECRET = os.getenv("STRAVA_CLIENT_SECRET")
 
 stravaurl = "https://www.strava.com/api/v3"
 
-def refreshBearer(bearer: Bearer) -> None:
+def refreshBearer(expires_at: int, refresh_token:str) -> dict:
     
-    if (round(datetime.utcnow().timestamp()) + 3500) < int(bearer.expires_at):
-        return 
+    if (round(datetime.utcnow().timestamp()) + 3500) < int(expires_at):
+        return None
     
     payload = {'client_id': STRAVA_CLIENT_ID, 
                 'client_secret': STRAVA_CLIENT_SECRET, 
                 'grant_type': 'refresh_token',
-                'refresh_token': bearer.refresh_token}
+                'refresh_token': refresh_token}
 
     r = requests.post(stravaurl + "/oauth/token", data=payload)
 
@@ -35,8 +35,7 @@ def refreshBearer(bearer: Bearer) -> None:
         logger.error("Error refreshing Bearer token")
         return 
     
-    bearer.load_json(returned_data)
-    bearer.save()
+    return returned_data
 
 
 def getBearerFromCode(code: str) -> Bearer:

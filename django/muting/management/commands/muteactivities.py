@@ -22,7 +22,11 @@ class Command(BaseCommand):
             logger.info("Checking muting activity %s", muting)
 
             if current_profile != muting.profile:
-                stravaapi.refreshBearer(muting.profile.bearer)
+                newbearer = stravaapi.refreshBearer(muting.profile.bearer.expires_at, muting.profile.bearer.refresh_token)
+                if newbearer:
+                    muting.profile.bearer.load_json(newbearer)
+                    muting.profile.bearer.save()
+
                 access_token = muting.profile.bearer.access_token
                 activities = stravaapi.getActivities(access_token, 1)
                 current_profile = muting.profile

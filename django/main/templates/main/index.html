@@ -3,7 +3,6 @@
 {% block title %}Stravatools{% endblock %}
 
 {% block content %}
-    <h1>Index page</h1>
     <a href="https://www.strava.com/oauth/authorize?client_id=96771&response_type=code&redirect_uri=http://localhost:8000/exchange_token&scope=activity:read_all,activity:write,profile:read_all">Autorize Strava</a>
     <div>
       <a href="{% url 'login' %}"> I already have an account </a>

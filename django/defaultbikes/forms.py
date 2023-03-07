@@ -8,7 +8,7 @@ class DefaultBikesForm(forms.ModelForm):
     def __init__(self, profile, *args, **kwargs):
         super(DefaultBikesForm, self).__init__(*args, **kwargs)
         if profile is None:
-            for field in self.fields:
+            for field in self.fields.values():
                 field.disabled = True
         else:        
             self.fields['indoor_bike'].queryset = Bike.objects.filter(profile=profile)

@@ -23,7 +23,11 @@ class Command(BaseCommand):
         for rem in reminders:
 
             if current_profile != rem.profile:
-                stravaapi.refreshBearer(rem.profile.bearer)
+                newbearer = stravaapi.refreshBearer(rem.profile.bearer.refresh_token, rem.profile.bearer.refresh_token)
+                if newbearer:
+                    rem.profile.bearer.load_json(newbearer)
+                    rem.profile.bearer.save()
+
                 access_token = rem.profile.bearer.access_token
                 athlete = stravaapi.getAthlete(access_token)
                 current_profile = rem.profile
