@@ -1,39 +1,51 @@
 {% extends "base.html" %}
 
+{% load crispy_forms_tags %}
+
 {% block title %}Stravatools Default Bike tool{% endblock %}
 
 {% block content %}
 
-    <h1>Default Bikes Page</h1>
-
-    {{ defaultbikesform.errors }}
-
-    <form method="POST" action={% url 'defaultbikes' %}>
-      {% csrf_token %}
-      {{ defaultbikesform }}
-      
-      {% if user.is_authenticated %}
-        <input type="submit" name='defaultbikes' value="Update">
-      {% else %}
-        <input type="submit" value="Update" disabled>
-      {% endif %}
     
-    </form>
+    <div class="container">
+      <h1>Default Bikes Page</h1>
+      <div class="row">
+        <div class="col">
+          {{ defaultbikesform.errors }}
 
-    <form method="POST" action={% url 'defaultbikes' %}>
-      {% csrf_token %}
-      {{ manualbikecorrectionform }}
-      
-      <input type="submit" name='manualbikecorrection' value="Update">
-   
-    </form>
-
-    {% for log in changelog %}
-    <p> {{ log }} <p>
-    {% endfor %}
-
-    {% for r in results %}
-      <p> {{ r }} </p>
-    {% endfor %}
+          <form method="POST" action={% url 'defaultbikes' %}>
+            {% csrf_token %}
+            {{ defaultbikesform|crispy }}
+            
+            {% if user.is_authenticated %}
+              <button class="btn btn-primary" type="submit" name='defaultbikes'>Update</button>
+            {% else %}
+              <button class="btn btn-primary" type="submit" disabled>Update</button>
+            {% endif %}
+          
+          </form>
+        </div>
+        <div class="col">
+          <form method="POST" action={% url 'defaultbikes' %}>
+            {% csrf_token %}
+            {{ manualbikecorrectionform|crispy }}
+            
+            <button class="btn btn-primary" type="submit" name='manualbikecorrection'>Update</button>
+        
+          </form>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col">
+        {% for log in changelog %}
+        <p> {{ log }} <p>
+        {% endfor %}
+        </div>
+        <div class="col">
+          {% for r in results %}
+            <p> {{ r }} </p>
+          {% endfor %}
+        </div>
+    </div>
     
 {% endblock %}

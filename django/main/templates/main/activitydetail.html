@@ -1,42 +1,47 @@
 {% extends "base.html" %}
 
+{% load crispy_forms_tags %}
+
 {% block title %}Stravatools Activity Detail{% endblock %}
 
 {% block content %}
-    <h1>Details for activity {{ id }}</h1>
-    
-    {{ form.errors }}
- 
-    <form method="post" action="{% url 'activitydetail' id %}">
-        {% csrf_token %}
-        <table>
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Distance</th>
-              <th>Type</th>
-              <th>Trainer</th>
-              <th>Commute</th>
-              <th>Hide</th>
-              <th>Description</th>
-              <th>Gear<th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>{{ form.name}}</td>
-              <td>{{ activity.distance }}</td>
-              <td>{{ activity.sport_type }}</td>
-              <td>{{ form.trainer }}</td>
-              <td>{{ form.commute }}</td>
-              <td>{{ form.hide_from_home }}</td>
-              <td>{{ form.description }}</td>
-              <td>{{ form.gear_id }} </td>
-            </tr>
-          </tbody>
-        </table>
-
-        <input type="submit" value="Update">
-    </form>
+    <div class="container">
+      <h1>Details for activity {{ id }}</h1>
+      
+      {{ form.errors }}
+  
+      <form method="post" action="{% url 'activitydetail' id %}">
+          {% csrf_token %}
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Distance</th>
+                <th>Type</th>
+                <th>Trainer</th>
+                <th>Commute</th>
+                <th>Hide</th>
+                <th>Description</th>
+                <th>Gear<th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>{{ form.name|as_crispy_field}}</td>
+                <td>{{ activity.distance }}</td>
+                <td>{{ activity.sport_type }}</td>
+                <td>{{ form.trainer|as_crispy_field }}</td>
+                <td>{{ form.commute|as_crispy_field }}</td>
+                <td>{{ form.hide_from_home|as_crispy_field }}</td>
+                <td>{{ form.description|as_crispy_field }}</td>
+                <td>{{ form.gear_id|as_crispy_field }} </td>
+              </tr>
+            </tbody>
+          </table>
+          
+          <button class="btn btn-primary" type="submit" style="float: right;">Update</button>
+          <a class="btn btn-primary" href="{% url 'activities' %}" role="button">Back</a>
+      </form>
+    </div>
 
     {% endblock %}

@@ -14,12 +14,12 @@
   <form method="post" action="{% url 'register' %}">
     {% csrf_token %}
   
-    {{ form }}
+    {{ form|crispy }}
 
-    <input type="submit" value="register">
+    <button class="btn btn-primary" type="submit">Register</button>
+    
    </form>
 
    <div><a href="{% url 'activities' %}"> Continue without an account</a></div>
  
-
 {% endblock %}

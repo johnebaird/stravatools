@@ -1,40 +1,44 @@
 {% extends "base.html" %}
 
+{% load crispy_forms_tags %}
+
 {% block title %}Stravatools Activity Page{% endblock %}
 
 {% block content %}
-    <h1>Activities Page</h1>
+    
 
-    <table>
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Name</th>
-          <th>Distance</th>
-          <th>Type</th>
-          <th>Trainer</th>
-          <th>Start Date</th>
-          <th>Gear<th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for a in activities %}    
-        <tr>
-          {% if stravawrite %}
-            <td><a href="{% url 'activitydetail' a.id %}">{{ a.id }}</a></td>
-          {% else %}
-            <td>{{ a.id }}</td>
-          {% endif %}
-          <td>{{ a.name}}</td>
-          <td>{{ a.distance }}</td>
-          <td>{{ a.type }}</td>
-          <td>{{ a.trainer }}</td>
-          <td>{{ a.start_date }}</td>
-          <td>{{ a.gear_name }} </td>
-        </tr>
-          {% endfor %}  
-      </tbody>
-    </table>
-    <br>
-     
+    <div class="container">
+      <h1>Activities</h1>
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Distance</th>
+            <th>Type</th>
+            <th>Trainer</th>
+            <th>Start Date</th>
+            <th>Gear<th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for a in activities %}    
+          <tr>
+            {% if stravawrite %}
+              <td><a href="{% url 'activitydetail' a.id %}">{{ a.id }}</a></td>
+            {% else %}
+              <td>{{ a.id }}</td>
+            {% endif %}
+            <td>{{ a.name}}</td>
+            <td>{{ a.distance }}</td>
+            <td>{{ a.type }}</td>
+            <td>{{ a.trainer }}</td>
+            <td>{{ a.start_date }}</td>
+            <td>{{ a.gear_name }} </td>
+          </tr>
+            {% endfor %}  
+        </tbody>
+      </table>
+    </div>
+         
     {% endblock %}

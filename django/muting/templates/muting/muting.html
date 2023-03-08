@@ -1,5 +1,7 @@
 {% extends "base.html" %}
 
+{% load crispy_forms_tags %}
+
 {% block title %}Stravatools Activity Muting Tool{% endblock %}
 
 {% block content %}
@@ -11,10 +13,10 @@
       {{ formset.management_form }}
 
       {% for form in formset %}
-      <p> {{ form }} </p> 
+      <p> {{ form|crispy }} </p> 
       {% endfor%}
 
-      <input type='submit' value="Update">
+      <button class="btn btn-primary" type="submit">Update</button>
 
       {% for log in changelog %}
       <p> {{ log }} <p>
