@@ -5,23 +5,21 @@
 {% block title %}Stravatools Activity Muting Tool{% endblock %}
 
 {% block content %}
-    <h1>Activity Muting</h1>
 
-    <form method='POST' action={% url 'muting' %}>
-      {% csrf_token %}
-      
-      {{ formset.management_form }}
+  <h1>Activity Muting</h1>
 
-      {% for form in formset %}
-      <p> {{ form|crispy }} </p> 
-      {% endfor%}
+  <form method='POST' action={% url 'muting' %}>
+    {% csrf_token %}
+    
+    {% crispy formset %}
 
-      <button class="btn btn-primary" type="submit">Update</button>
+    <button class="btn btn-primary" type="submit">Update</button>
 
-      {% for log in changelog %}
-      <p> {{ log }} <p>
-      {% endfor %}
-      
-    </form>
+    {% for log in changelog %}
+    <p> {{ log }} <p>
+    {% endfor %}
+    
+  </form>
+
 
 {% endblock %}

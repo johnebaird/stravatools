@@ -5,6 +5,8 @@ from django.dispatch import receiver
 
 # Create your models here.
 
+distancechoice = [('km', 'km'), ('miles','miles')]
+                 
 class Bearer(models.Model):
     access_token = models.CharField(max_length=100)
     expires_at = models.IntegerField()
@@ -25,6 +27,7 @@ class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     bearer = models.OneToOneField(Bearer, on_delete=models.SET_NULL, blank=True, null=True)
     defaultbikes = models.OneToOneField(to='defaultbikes.DefaultBike', on_delete=models.SET_NULL, blank=True, null=True)
+    distance = models.CharField(max_length=100, default='km', choices=distancechoice)
 
     def __str__(self):
         return self.user.username

@@ -1,12 +1,17 @@
 from django.forms import ModelForm, BaseModelFormSet
+
 from .models import Reminder
 from main.models import Bike
+
+from crispy_forms.helper import FormHelper
 
 class ReminderFormSet(BaseModelFormSet):
     def __init__(self, profile, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.queryset = Reminder.objects.filter(profile=profile)
         self.form_kwargs = {'profile': profile}
+        self.helper = FormHelper()
+        self.helper.template = 'bootstrap5/table_inline_formset.html'
 
 class ReminderForm(ModelForm):
 
@@ -18,3 +23,5 @@ class ReminderForm(ModelForm):
     class Meta:   
         model = Reminder 
         fields = ("bike", "email", "message", "every",)
+
+    

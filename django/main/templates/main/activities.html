@@ -6,15 +6,17 @@
 
 {% block content %}
     
-
-    <div class="container">
       <h1>Activities</h1>
       <table class="table table-striped">
         <thead>
           <tr>
             <th>ID</th>
             <th>Name</th>
-            <th>Distance</th>
+            {% if user.is_authenticated and user.profile.distance == "miles" %}
+              <th>Distance (miles)</th>
+            {% else %}
+              <th>Distance (km)</th>
+            {% endif %}
             <th>Type</th>
             <th>Trainer</th>
             <th>Start Date</th>
@@ -30,7 +32,11 @@
               <td>{{ a.id }}</td>
             {% endif %}
             <td>{{ a.name}}</td>
-            <td>{{ a.distance }}</td>
+            {% if user.is_authenticated and user.profile.distance == "miles" %}
+              <td>{{ a.distance }}</td>
+            {% else %}
+              <td>{{ a.distance }}</td>
+            {% endif %}
             <td>{{ a.type }}</td>
             <td>{{ a.trainer }}</td>
             <td>{{ a.start_date }}</td>
@@ -39,6 +45,6 @@
             {% endfor %}  
         </tbody>
       </table>
-    </div>
+
          
     {% endblock %}

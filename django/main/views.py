@@ -60,7 +60,13 @@ def activitydetail(request, id):
                    'gear_id': activity['gear_id']}
 
         form = UpdatableActivity(initial=initial)
-        
+        form.distance = activity['distance']
+        form.sport_type = activity['sport_type']
+
+        if request.user.is_authenticated and request.user.profile.distance == 'miles':
+            activity['distance'] = round(activity['distance'] * 0.000621371,2)
+        else:
+            activity['distance'] = round(activity['distance'] * 0.001,2)
         
         # make tuples of bike and id for choice object drop down
         if 'bikechoices' not in request.session:
@@ -71,7 +77,7 @@ def activitydetail(request, id):
         request.session['activity'] = activity
         request.session['initial'] = initial
 
-    return render(request, 'main/activitydetail.html', {'form': form, 'id': id, 'activity': request.session['activity']})
+    return render(request, 'main/activitydetail.html', {'form': form, 'id': id})
 
 
 def register(request):
@@ -122,6 +128,13 @@ def activities(request):
     page = request.GET.get('page', '1')
 
     activities = stravaapi.getActivities(request.session['access_token'], page)
+
+    if request.user.is_authenticated and request.user.profile.distance == 'miles':
+        for a in activities:
+            a['distance'] = round(a['distance'] * 0.000621371,2)
+    else:
+        for a in activities:
+            a['distance'] = round(a['distance'] * 0.001,2)
 
     # add gear name along with id to activities dict
     for bike in request.session['athlete']['bikes']:

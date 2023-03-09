@@ -5,27 +5,20 @@
 {% block title %}Stravatools Maintenance Reminder Tool{% endblock %}
 
 {% block content %}
-    <div class="container">
-      <h1>Maintenance Reminder Page</h1>
 
-      <form method='POST' action={% url 'maintenance' %}>
-        {% csrf_token %}
-        
-        {{ formset.management_form }}
+    <h1>Maintenance Reminder Page</h1>
 
-        {% for form in formset %}
-        <p> {{ form }} </p> 
-        
-        {% endfor%}
+    <form method='POST' action={% url 'maintenance' %}>
+      {% csrf_token %}
+      
+      {% crispy formset %}
+      
+      <button class="btn btn-primary" type="submit">Update</button>
+    </form>
 
-        <button class="btn btn-primary" type="submit">Update</button>
-      </form>
-    </div>
+    {% for log in changelog %}
+    <p> {{ log }} <p>
+    {% endfor %}
 
-    <div class="container">
-      {% for log in changelog %}
-      <p> {{ log }} <p>
-      {% endfor %}
-      </div>
 
 {% endblock %}

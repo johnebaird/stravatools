@@ -1,23 +1,20 @@
 {% extends "base.html" %}
 
+{% load crispy_forms_tags %}
+
 {% block title %}Stravatools{% endblock %}
 
 {% block content %}
 
-  <body>
     <h1>Register page</h1>
     <p>To save strava link information permenently create account to save this info</p>
     <p>Account will also be needed for any functions that run in the background as auto updates of indoor and outdoor bikes and maintenance reminders</p>
 
-  {{ form.errors }}
- 
   <form method="post" action="{% url 'register' %}">
     {% csrf_token %}
   
     {{ form|crispy }}
 
-    <button class="btn btn-primary" type="submit">Register</button>
-    
    </form>
 
    <div><a href="{% url 'activities' %}"> Continue without an account</a></div>
