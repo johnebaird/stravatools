@@ -4,6 +4,7 @@ from .models import Reminder
 from main.models import Bike
 
 from crispy_forms.helper import FormHelper
+from crispy_forms.layout import Submit
 
 class ReminderFormSet(BaseModelFormSet):
     def __init__(self, profile, *args, **kwargs):
@@ -12,6 +13,7 @@ class ReminderFormSet(BaseModelFormSet):
         self.form_kwargs = {'profile': profile}
         self.helper = FormHelper()
         self.helper.template = 'bootstrap5/table_inline_formset.html'
+        self.helper.add_input(Submit('submit', 'Submit'))
 
 class ReminderForm(ModelForm):
 
@@ -23,5 +25,11 @@ class ReminderForm(ModelForm):
     class Meta:   
         model = Reminder 
         fields = ("bike", "email", "message", "every",)
+        labels = {
+            "bike": "Bike",
+            "email": "Email",
+            "messsage": "Reminder message to send",
+            "every": "remind every (km)",
+        }
 
     

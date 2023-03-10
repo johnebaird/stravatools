@@ -14,7 +14,7 @@
 
           <form method="POST" action={% url 'defaultbikes' %}>
             {% csrf_token %}
-            {% crispy defaultbikesform %}
+            {{ defaultbikesform|crispy }}
             
             {% if user.is_authenticated %}
               <button class="btn btn-primary" type="submit" name='defaultbikes'>Update</button>
@@ -27,7 +27,7 @@
         <div class="col">
           <form method="POST" action={% url 'defaultbikes' %}>
             {% csrf_token %}
-            {% crispy manualbikecorrectionform %}
+            {{ manualbikecorrectionform|crispy  }}
             
             <button class="btn btn-primary" type="submit" name='manualbikecorrection'>Update</button>
         

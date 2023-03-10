@@ -33,7 +33,8 @@ def maintenance(request):
                     if form.instance.last_sent is None:
                         form.instance.last_sent = form.instance.bike.distance
                     form.save()
-            
+
+             formset.save()
              formset = MaintenanceFormSet(request.user.profile)
 
     else:

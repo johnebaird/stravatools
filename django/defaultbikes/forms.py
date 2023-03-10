@@ -17,6 +17,10 @@ class DefaultBikesForm(forms.ModelForm):
     class Meta:
         model = DefaultBike
         fields = ['indoor_bike', 'outdoor_bike', 'autochange_indoor_bike', 'autochange_outdoor_bike']
+        labels = {
+            'autochange_indoor_bike': 'Change all new indoor activities to indoor bike',
+            'autochange_outdoor_bike': 'Change all new outdoor activities to outdoor bike',
+        }
 
 class DateInput(forms.DateInput):
     input_type = 'date'
@@ -27,10 +31,10 @@ def date_not_in_future(value):
     return value
 
 class ManualBikeCorrection(forms.Form):
-    after = forms.DateField(widget=DateInput(), validators=[date_not_in_future])
-    before = forms.DateField(widget=DateInput(), validators=[date_not_in_future])
-    activitytype = forms.ChoiceField(choices=(("indoor", "Indoor"), ('outdoor',"Outdoor")))
-    bike = forms.ChoiceField()
+    after = forms.DateField(widget=DateInput(), validators=[date_not_in_future], label="from:")
+    before = forms.DateField(widget=DateInput(), validators=[date_not_in_future], label='to:')
+    activitytype = forms.ChoiceField(choices=(("indoor", "Indoor"), ('outdoor',"Outdoor")), label='for ride type')
+    bike = forms.ChoiceField(label='to bike')
 
     def clean(self):
         cleaned_data = super().clean()

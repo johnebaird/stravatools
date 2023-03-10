@@ -1,6 +1,6 @@
 from django import forms
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout, Fieldset, HTML
+from crispy_forms.layout import Layout, Fieldset, HTML, Submit
 
 class UpdatableActivity(forms.Form):
     commute = forms.BooleanField(required=False)
@@ -25,6 +25,7 @@ class UpdatableActivity(forms.Form):
                      'commute',
                      'trainer',
                      'hide_from_home',
-                     'gear_id')
+                     'gear_id'),
+                     Submit('submit', 'Submit'),
         )
 

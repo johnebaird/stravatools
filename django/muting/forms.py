@@ -3,6 +3,8 @@ from django.forms import ModelForm, BaseModelFormSet
 from .models import Muting
 
 from crispy_forms.helper import FormHelper
+from crispy_forms.layout import Submit
+    
 
 class MutingFormSet(BaseModelFormSet):
     def __init__(self, profile, *args, **kwargs):
@@ -11,6 +13,7 @@ class MutingFormSet(BaseModelFormSet):
         self.form_kwargs = {'profile': profile}
         self.helper = FormHelper()
         self.helper.template = 'bootstrap5/table_inline_formset.html'
+        self.helper.add_input(Submit('submit', 'Submit'))
 
 class MutingForm(ModelForm):
 
@@ -21,6 +24,11 @@ class MutingForm(ModelForm):
     class Meta:
         model = Muting
         fields = ['activitytype', 'duration', 'muteall',]
+        labels = {
+            "activitytype": "Activity Type",
+            "duration": "Duration",
+            "muteall": "Mute all activities",
+        }
 
 
 
