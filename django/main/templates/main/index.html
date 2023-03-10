@@ -3,8 +3,31 @@
 {% block title %}Stravatools{% endblock %}
 
 {% block content %}
-    <a href="https://www.strava.com/oauth/authorize?client_id=96771&response_type=code&redirect_uri=http://localhost:8000/exchange_token&scope=activity:read_all,activity:write,profile:read_all">Autorize Strava</a>
-    <div>
-      <a href="{% url 'login' %}"> I already have an account </a>
+<div class="row">
+  <div class="col">
+  <div class="card text-bg-secondary">
+    <div class="card-body">
+      <p>Welcome to Stravatools, This site uses the Strava API to implement some useful features:</p>
+      <ul>
+        <li>Default indoor/outdoor bikes</li>
+        <li>Maintenance reminders every X km</li>
+        <li>Automatically Hiding activities from the main feed</li>
+      </ul>
+      <p>To continue you'll need to click on the autorize Strava link to authorize this site access to your strava account</p>
+      <p>After account is created you'll be prompted to create an account on this site which is required for background tasks like automatically changing default indoor and outdoor bikes or muting activities but is otherwise optional</p>
     </div>
+  </div>
+</div>
+<div class="col">
+    <h4>
+      <i class="bi bi-caret-right-fill"></i>
+      <a href="https://www.strava.com/oauth/authorize?client_id=96771&response_type=code&redirect_uri=http://localhost:8000/exchange_token&scope=activity:read_all,activity:write,profile:read_all">Autorize Strava</a>
+    </h4>
+    <br>
+    <h4>
+      <i class="bi bi-caret-right-fill"></i>
+      <a href="{% url 'login' %}"> I already have an account </a>
+    </h4>
+  </div>
+</div>
 {% endblock %}
