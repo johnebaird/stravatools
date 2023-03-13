@@ -12,3 +12,4 @@ springboot/target/*
 db.sqlite3
 */migrations/*
 
+django/stravatools/settings.py
