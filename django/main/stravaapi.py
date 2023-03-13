@@ -4,7 +4,6 @@ import logging
 import json
 
 from .models import Bearer
-from main.models import Bike
 
 from datetime import datetime, time, timezone
 
@@ -17,7 +16,7 @@ stravaurl = "https://www.strava.com/api/v3"
 
 def refreshBearer(expires_at: int, refresh_token:str) -> dict:
     
-    if (round(datetime.utcnow().timestamp()) + 3500) < int(expires_at):
+    if (round(datetime.utcnow().replace(tzinfo=timezone.utc).timestamp()) + 3500) < int(expires_at):
         return None
     
     payload = {'client_id': STRAVA_CLIENT_ID, 
@@ -82,8 +81,8 @@ def changeActivityDateRange(access_token: str, after: datetime, before: datetime
     results.append("Querying strava for activities between " + str(after) + " and " + str(before))
 
     # magic datetime stuff
-    before = round(datetime.combine(before, time(0,0,0), tzinfo=timezone.utc).timestamp())
-    after = round(datetime.combine(after, time(23,59,59), tzinfo=timezone.utc).timestamp())
+    before = round(datetime.combine(before, time(23,59,59), tzinfo=timezone.utc).timestamp())
+    after = round(datetime.combine(after, time(0,0,0), tzinfo=timezone.utc).timestamp())
 
     headers = {"Authorization" : "Bearer " + access_token}
     params = {"page": 1, 

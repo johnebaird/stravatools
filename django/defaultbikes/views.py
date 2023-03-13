@@ -52,6 +52,10 @@ def defaultbikes(request):
                                                   before=manualbikecorrectionform.cleaned_data['before'], 
                                                   bike=bikedata, 
                                                   change=manualbikecorrectionform.cleaned_data['activitytype'])
+            # we'll need to reload activitydata to see changes
+            if 'activitydata' in request.session:
+                del request.session['activitydata']
+
                 
     try:
         defaultbikesform

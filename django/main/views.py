@@ -5,7 +5,7 @@ from django.contrib.auth.forms import UserCreationForm, PasswordChangeForm
 from django.contrib.auth import authenticate, login
 
 from . import stravaapi
-from .models import Bearer
+from .models import Bearer, Logging
 from .forms import UpdatableActivity
 from .utils import checkbearer, get_bike_choices
 
@@ -20,6 +20,8 @@ def index(request):
         return render(request, 'main/index.html')
 
 def profile(request):
+
+    changelog = Logging.objects.filter(profile=request.user.profile).order_by('datetime')[:10]
     
     if request.method == 'POST':
         passwordform = PasswordChangeForm(request.user,request.POST)
@@ -30,7 +32,7 @@ def profile(request):
     else:
         passwordform = PasswordChangeForm(request.user)
 
-    return render(request, 'registration/profile.html', {'passwordform': passwordform})
+    return render(request, 'registration/profile.html', {'passwordform': passwordform, 'changelog': changelog})
     
 def activitydetail(request, id):
 
@@ -54,6 +56,10 @@ def activitydetail(request, id):
 
             logger.debug("Updating activity with:" + str(update))
             stravaapi.updateActivity(request.session['access_token'], id, update)
+            
+            # we'll need to reload activitydata to see changes
+            if 'activitydata' in request.session:
+                del request.session['activitydata']
 
             return redirect(activities)
     
@@ -148,20 +154,25 @@ def activities(request):
 
     page = request.GET.get('page', '1')
 
-    activities = stravaapi.getActivities(request.session['access_token'], page)
-
-    if request.user.is_authenticated and request.user.profile.distance == 'miles':
-        for a in activities:
-            a['distance'] = round(a['distance'] * 0.000621371,2)
+    # save activity data so we don't query API on every request
+    if 'activitydata' in request.session:
+        activities = request.session['activitydata']
     else:
-        for a in activities:
-            a['distance'] = round(a['distance'] * 0.001,2)
+        activities = stravaapi.getActivities(request.session['access_token'], page)
+        # add gear name along with id to activities dict
+        for bike in request.session['athlete']['bikes']:
+            for a in activities:
+                if a['gear_id'] == bike['id']:
+                    a['gear_name'] = bike['nickname']
+        
+        if request.user.is_authenticated and request.user.profile.distance == 'miles':
+            for a in activities:
+                a['distance'] = round(a['distance'] * 0.000621371,2)
+        else:
+            for a in activities:
+                a['distance'] = round(a['distance'] * 0.001,2)
 
-    # add gear name along with id to activities dict
-    for bike in request.session['athlete']['bikes']:
-        for a in activities:
-            if a['gear_id'] == bike['id']:
-                a['gear_name'] = bike['nickname']
+        request.session['activitydata'] = activities
 
     return render(request, "main/activities.html", context={"activities": activities, 'stravawrite': request.session['stravawrite']})
 

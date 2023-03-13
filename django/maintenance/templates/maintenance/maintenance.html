@@ -6,18 +6,28 @@
 
 {% block content %}
 
-    <h1>Maintenance Reminder Page</h1>
+  <div class="container">
+    <div class="row row-gap-3">
+        <div class="alert alert-primary">
+          Send text reminders to do bike maintenance after every X number of kilometers
+      </div>
+    </div>
+    <div class="row">
+      <form method='POST' action={% url 'maintenance' %}>
+        {% csrf_token %}
+        
+        {% crispy formset %}
+        
+      </form>
+    </div>
 
-    <form method='POST' action={% url 'maintenance' %}>
-      {% csrf_token %}
-      
-      {% crispy formset %}
-      
-    </form>
-
-    {% for log in changelog %}
-    <p> {{ log }} <p>
-    {% endfor %}
-
+    <div class="row">
+      <div class="alert alert-secondary">
+        {% for log in changelog %}
+        <code><small> {{ log }} </small></code><br>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
 
 {% endblock %}

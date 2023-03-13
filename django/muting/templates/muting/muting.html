@@ -6,18 +6,27 @@
 
 {% block content %}
 
-  <h1>Activity Muting</h1>
+<div class="container">
+  <div class="row">
+      <div class="alert alert-primary">
+        Mute certain activities from the global feed based on duration or type
+    </div>
+  </div>
+  <div class="row">
+    <form method='POST' action={% url 'muting' %}>
+      {% csrf_token %}
+      
+      {% crispy formset %}
 
-  <form method='POST' action={% url 'muting' %}>
-    {% csrf_token %}
-    
-    {% crispy formset %}
-
-    {% for log in changelog %}
-    <p> {{ log }} <p>
-    {% endfor %}
-    
-  </form>
-
+      <div class="row">
+        <div class="alert alert-secondary">
+          {% for log in changelog %}
+          <code><small> {{ log }} </small></code><br>
+          {% endfor %}
+        </div>
+      </div>
+      
+    </form>
+  </div>
 
 {% endblock %}
