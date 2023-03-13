@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% load crispy_forms_tags %}
+
+{% block title %}Stravatools Profile{% endblock %}
+
+{% block content %}
+
+<div class="row">
+    <div class="col">
+        <div class="mb-3">
+            <label class="form-label">Username</label>
+            <input class="form-control" placeholder="{{ request.user.username }}" disabled>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Account Created</label>
+            <input class="form-control" placeholder="{{ request.user.date_joined }}" disabled>
+        </div>
+        <br>
+        <div class="mb-3">
+            <label class="form-label">Bearer Token</label>
+            <input class="form-control" placeholder="{{ request.user.profile.bearer}}" disabled>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Write Access</label>
+            <input class="form-control" placeholder="{{ request.user.profile.bearer.write_access}}" disabled>
+        </div>
+        <div class="mb-3">
+            <a href="https://www.strava.com/oauth/authorize?client_id=96771&response_type=code&redirect_uri=http://localhost:8000/exchange_token&scope=activity:read_all,activity:write,profile:read_all">Reauthorize Strava</a>
+        </div>
+        
+    </div>
+    <div class="col">
+        <form method="post" action="{% url 'profile' %}">
+            {% csrf_token %}
+        
+            {{ passwordform|crispy }}
+            
+            <button class="btn btn-primary" type="submit">Change Password</button>
+        </form>
+    </div>
+</div>
+
+
+{% endblock %}

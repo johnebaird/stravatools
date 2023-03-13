@@ -1,13 +1,11 @@
 import logging
 
-from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from django.template import Context
+from django.contrib.auth.forms import UserCreationForm, PasswordChangeForm
 from django.contrib.auth import authenticate, login
 
 from . import stravaapi
-from .models import Bearer, Profile
+from .models import Bearer
 from .forms import UpdatableActivity
 from .utils import checkbearer, get_bike_choices
 
@@ -22,7 +20,17 @@ def index(request):
         return render(request, 'main/index.html')
 
 def profile(request):
-    return redirect(activities)
+    
+    if request.method == 'POST':
+        passwordform = PasswordChangeForm(request.user,request.POST)
+        if passwordform.is_valid():
+            passwordform.save()
+            login(request, request.user)
+
+    else:
+        passwordform = PasswordChangeForm(request.user)
+
+    return render(request, 'registration/profile.html', {'passwordform': passwordform})
     
 def activitydetail(request, id):
 
@@ -109,6 +117,7 @@ def register(request):
 
 def exchange_token(request):
     # need at least read access
+
     if 'activity:read_all' not in request.GET['scope'] or 'profile:read_all' not in request.GET['scope']:
         redirect(index)
 
@@ -118,6 +127,18 @@ def exchange_token(request):
     request.session['stravawrite'] = 'activity:write' in request.GET['scope']
 
     request.session.modified = True
+
+    if (request.user.is_authenticated):
+            
+            # overwrite current bearer token if user is authenticated
+            request.user.profile.bearer.load_json(request.session['bearer'])
+            request.user.profile.bearer.write_access = request.session['stravawrite']
+            request.user.profile.bearer.save()
+            request.user.profile.save()
+            
+            del request.session['bearer']
+            return redirect(profile)
+    
     return redirect(register)
 
 
