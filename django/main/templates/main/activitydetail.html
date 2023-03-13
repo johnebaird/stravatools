@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% load crispy_forms_tags %}
+
+{% block title %}Stravatools Activity Detail{% endblock %}
+
+{% block content %}
+
+      <h1>Details for activity {{ id }}</h1>
+      
+      <form method="post" action="{% url 'activitydetail' id %}">
+          {% csrf_token %}
+
+          {% crispy form %}
+            
+        <br>
+        <a class="btn btn-primary" href="{% url 'activities' %}" role="button">Back</a>
+      </form>
+
+    {% endblock %}

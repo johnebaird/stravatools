@@ -1,8 +1,15 @@
 
 .vscode/launch.json
-.env
-application.properties
-Test.java
-demo/demo/src/main/astra/secure-connect-spring-cassandra.zip
-target/*
 
+.env
+*.png
+*.pyc
+*.jar
+
+springboot/Test.java
+springboot/target/*
+
+db.sqlite3
+*/migrations/*
+
+django/stravatools/settings.py

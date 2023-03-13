@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% load crispy_forms_tags %}
+
+{% block title %}Stravatools Maintenance Reminder Tool{% endblock %}
+
+{% block content %}
+
+  <div class="container">
+    <div class="row row-gap-3">
+        <div class="alert alert-primary">
+          Send text reminders to do bike maintenance after every X number of kilometers
+      </div>
+    </div>
+    <div class="row">
+      <form method='POST' action={% url 'maintenance' %}>
+        {% csrf_token %}
+        
+        {% crispy formset %}
+        
+      </form>
+    </div>
+
+    <div class="row">
+      <div class="alert alert-secondary">
+        {% for log in changelog %}
+        <code><small> {{ log }} </small></code><br>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+{% endblock %}

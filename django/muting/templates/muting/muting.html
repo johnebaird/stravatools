@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% load crispy_forms_tags %}
+
+{% block title %}Stravatools Activity Muting Tool{% endblock %}
+
+{% block content %}
+
+<div class="container">
+  <div class="row">
+      <div class="alert alert-primary">
+        Mute certain activities from the global feed based on duration or type
+    </div>
+  </div>
+  <div class="row">
+    <form method='POST' action={% url 'muting' %}>
+      {% csrf_token %}
+      
+      {% crispy formset %}
+
+      <div class="row">
+        <div class="alert alert-secondary">
+          {% for log in changelog %}
+          <code><small> {{ log }} </small></code><br>
+          {% endfor %}
+        </div>
+      </div>
+      
+    </form>
+  </div>
+
+{% endblock %}
