@@ -18,6 +18,7 @@ from django.urls import path, include
 
 urlpatterns = [
     path('', include('main.urls')),
+    path('', include('activities.urls')),
     path('', include('defaultbikes.urls')),
     path('', include('maintenance.urls')),
     path('', include('muting.urls')),

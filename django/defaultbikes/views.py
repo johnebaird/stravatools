@@ -4,9 +4,8 @@ from django.shortcuts import render, redirect
 from django.forms import formset_factory
 
 from .forms import DefaultBikesForm, ManualBikeCorrection
-from .models import DefaultBike, Bike
+from .models import Bike
 from main.utils import checkbearer, get_bike_choices
-from main.views import index, activities
 from main.models import Logging
 from main import stravaapi
 
@@ -16,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 def defaultbikes(request):
 
-    if not checkbearer(request): return redirect(index)
+    if not checkbearer(request): return redirect("main:index")
     if not request.session['stravawrite']: return redirect(activities)
     
     results = []

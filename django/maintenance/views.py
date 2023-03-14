@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 @login_required
 def maintenance(request):
 
-    if not checkbearer(request): return redirect(index)
+    if not checkbearer(request): return redirect("main:index")
     changelog = Logging.objects.filter(profile=request.user.profile, application='maintenance').order_by('datetime')[:10]
     
     MaintenanceFormSet = modelformset_factory(Reminder, formset=ReminderFormSet, form=ReminderForm, extra=1, can_delete=True)

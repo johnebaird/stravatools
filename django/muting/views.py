@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 @login_required
 def muting(request):
 
-    if not checkbearer(request): redirect(index)
+    if not checkbearer(request): redirect("main:index")
     if not request.session['stravawrite']: return redirect(activities)
 
     changelog = Logging.objects.filter(profile=request.user.profile, application='muting').order_by('datetime')[:10]
