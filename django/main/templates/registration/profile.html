@@ -26,7 +26,11 @@
             <input class="form-control" placeholder="{{ request.user.profile.bearer.write_access}}" disabled>
         </div>
         <div class="mb-3">
-            <a href="https://www.strava.com/oauth/authorize?client_id=96771&response_type=code&redirect_uri=http://localhost:8000/exchange_token&scope=activity:read_all,activity:write,profile:read_all">Reauthorize Strava</a>
+            {% if request.is_secure %}
+            <a href="https://www.strava.com/oauth/authorize?client_id=96771&response_type=code&redirect_uri=https://{{ request.get_host }}/exchange_token&scope=activity:read_all,activity:write,profile:read_all">Autorize Strava</a>
+            {% else %}
+            <a href="https://www.strava.com/oauth/authorize?client_id=96771&response_type=code&redirect_uri=http://{{ request.get_host }}/exchange_token&scope=activity:read_all,activity:write,profile:read_all">Autorize Strava</a>
+            {% endif %}
         </div>
         
     </div>

@@ -67,7 +67,7 @@ def activitydetail(request, id):
         request.session['activity'] = activity
         request.session['initial'] = initial
 
-    return render(request, 'main/activitydetail.html', {'form': form, 'id': id})
+    return render(request, 'activities/activitydetail.html', {'form': form, 'id': id})
 
 
 def activities(request):
@@ -96,4 +96,4 @@ def activities(request):
 
         request.session['activitydata'] = activities
 
-    return render(request, "main/activities.html", context={"activities": activities, 'stravawrite': request.session['stravawrite']})
+    return render(request, "activities/activities.html", context={"activities": activities, 'stravawrite': request.session['stravawrite']})
