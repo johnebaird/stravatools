@@ -8,13 +8,13 @@
 
       <h1>Details for activity {{ id }}</h1>
       
-      <form method="post" action="{% url 'activitydetail' id %}">
+      <form method="post" action="{% url 'activities:activitydetail' id %}">
           {% csrf_token %}
 
           {% crispy form %}
             
         <br>
-        <a class="btn btn-primary" href="{% url 'activities' %}" role="button">Back</a>
+        <a class="btn btn-primary" href="{% url 'activities:activities' %}" role="button">Back</a>
       </form>
 
     {% endblock %}

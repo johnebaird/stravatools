@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 def defaultbikes(request):
 
     if not checkbearer(request): return redirect("main:index")
-    if not request.session['stravawrite']: return redirect(activities)
+    if not request.session['stravawrite']: return redirect('activities:activities')
     
     results = []
     changelog = {}

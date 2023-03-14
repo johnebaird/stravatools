@@ -20,7 +20,7 @@
           </div>
         </div>
         <div class="col">
-          <form method="POST" action={% url 'defaultbikes' %}>
+          <form method="POST" action={% url 'defaultbikes:defaultbikes' %}>
             {% csrf_token %}
             {{ defaultbikesform|crispy }}
             
@@ -32,7 +32,7 @@
           </form>
         </div>
         <div class="col">
-          <form method="POST" action={% url 'defaultbikes' %}>
+          <form method="POST" action={% url 'defaultbikes:defaultbikes' %}>
             {% csrf_token %}
             {{ manualbikecorrectionform|crispy  }}
             

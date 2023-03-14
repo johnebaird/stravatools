@@ -35,7 +35,7 @@
         
     </div>
     <div class="col">
-        <form method="post" action="{% url 'profile' %}">
+        <form method="post" action="{% url 'main:profile' %}">
             {% csrf_token %}
         
             {{ passwordform|crispy }}

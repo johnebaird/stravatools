@@ -2,12 +2,10 @@ import logging
 
 from django.shortcuts import render, redirect
 from django.contrib.auth.forms import UserCreationForm, PasswordChangeForm
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import login
 
 from . import stravaapi
 from .models import Bearer, Logging
-from .utils import checkbearer, get_bike_choices
-from activities.views import activities
 
 logger = logging.getLogger(__name__)
 
@@ -15,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 def index(request):
     if request.user.is_authenticated and request.user.profile.bearer:
-        return redirect(activities)
+        return redirect('activities:activities')
     else:
         return render(request, 'main/index.html')
 
@@ -37,7 +35,7 @@ def profile(request):
 def register(request):
     # redirect to index page if they haven't authed to strava yet
     if 'bearer' not in request.session: 
-        return redirect("main:index")
+        return redirect('main:index')
 
     if request.method == 'POST':
 
@@ -54,7 +52,7 @@ def register(request):
             
             del request.session['bearer']
             
-            return redirect(activities)
+            return redirect('activities:activities')
     else:
         form = UserCreationForm()
     
@@ -65,7 +63,7 @@ def exchange_token(request):
     # need at least read access
 
     if 'activity:read_all' not in request.GET['scope'] or 'profile:read_all' not in request.GET['scope']:
-        redirect("main:index")
+        redirect('main:index')
 
     request.session['bearer'] = stravaapi.getBearerFromCode(request.GET['code'])
     
@@ -83,9 +81,9 @@ def exchange_token(request):
             request.user.profile.save()
             
             del request.session['bearer']
-            return redirect(profile)
+            return redirect('main:profile')
     
-    return redirect(register)
+    return redirect('main:register')
 
 
 

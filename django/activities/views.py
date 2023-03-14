@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 def activitydetail(request, id):
 
     if not checkbearer(request): return redirect("main:index")
-    if not request.session['stravawrite']: return redirect(activities)
+    if not request.session['stravawrite']: return redirect('activities:activities')
     
     if request.method == 'POST':
 
@@ -37,7 +37,7 @@ def activitydetail(request, id):
             if 'activitydata' in request.session:
                 del request.session['activitydata']
 
-            return redirect(activities)
+            return redirect('activities:activities')
     
     else:
         activity = stravaapi.getActivityFromId(request.session['access_token'], id)

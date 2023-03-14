@@ -15,22 +15,22 @@
             {% block navbar %}
             <ul class="nav nav-fill">
                 <li class="nav-item">
-                  <a class="nav-link active" aria-current="page" href="{% url 'activities' %}">Activities</a>
+                  <a class="nav-link active" aria-current="page" href="{% url 'activities:activities' %}">Activities</a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link" href="{% url 'defaultbikes' %}">Default Bikes</a>
+                  <a class="nav-link" href="{% url 'defaultbikes:defaultbikes' %}">Default Bikes</a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link" href="{% url 'maintenance' %}">Maintenance Reminders</a>
+                  <a class="nav-link" href="{% url 'maintenance:maintenance' %}">Maintenance Reminders</a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link" href="{% url 'muting' %}">Activity Muting</a>
+                  <a class="nav-link" href="{% url 'muting:muting' %}">Activity Muting</a>
                 </li>
                   {% if user.is_authenticated %} 
                   <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">Logged in: {{ user }}</a>
                     <ul class="dropdown-menu">
-                      <li><a class="dropdown-item" href="{% url 'profile' %}">Profile</a></li>
+                      <li><a class="dropdown-item" href="{% url 'main:profile' %}">Profile</a></li>
                       <li><a class="dropdown-item" href="{% url 'logout' %}">Logout</a></li>
                     </ul>
                   </li>

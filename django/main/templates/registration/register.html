@@ -10,13 +10,13 @@
     <p>To save strava link information permenently create account to save this info</p>
     <p>Account will also be needed for any functions that run in the background as auto updates of indoor and outdoor bikes and maintenance reminders</p>
 
-  <form method="post" action="{% url 'register' %}">
+  <form method="post" action="{% url 'main:register' %}">
     {% csrf_token %}
   
     {{ form|crispy }}
 
    </form>
 
-   <div><a href="{% url 'activities' %}"> Continue without an account</a></div>
+   <div><a href="{% url 'activities:activities' %}"> Continue without an account</a></div>
  
 {% endblock %}
