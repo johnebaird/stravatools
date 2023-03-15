@@ -1,20 +1,20 @@
-import os
-
-from datetime import datetime
+from datetime import datetime, timezone
 
 from django.test import TestCase
 from django.test import Client
 from django.urls import reverse
+from django.contrib.auth import authenticate
 
 from django.contrib.auth.models import User
-from main.models import Bearer
+from main.models import Bearer, Logging
 
 # Create your tests here.
+
 
 class IndexPageTests(TestCase):
     def setUp(self):
         self.client = Client()
-
+        
     def test_index_anonymous(self):
         response = self.client.get(reverse('main:index'))
 
@@ -60,9 +60,38 @@ class TestLoggedOutPage(TestCase):
         self.assertRedirects(response, reverse('main:index'), fetch_redirect_response=False)
 
 
-class TestLoggedInPage(TestCase):
+class TestProfilePage(TestCase):
     def setUp(self):
         self.client = Client()
+
+    def test_require_login(self):
+
+        response = self.client.get(reverse('main:profile'))
+        self.assertRedirects(response, reverse('login')+"?next="+reverse('main:profile'), status_code=302, target_status_code=200)
+
+    def test_profile_shows_data(self):
+
+        user = User.objects.get_or_create(username='testuser')[0]
+        Logging.objects.create(datetime=datetime.now(tz=timezone.utc), profile=user.profile, message='test log message')
+
+        self.client.force_login(user)
+
+        response = self.client.get(reverse('main:profile'))
+        
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'testuser')
+        self.assertContains(response, 'test log message')
+
+        
+
+
+
+
+
+
+        
+
+
 
 
 

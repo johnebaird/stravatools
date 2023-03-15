@@ -6,10 +6,10 @@
 
 {% block content %}
 
-    <h1>Register page</h1>
-    <p>To save strava link information permenently create account to save this info</p>
-    <p>Account will also be needed for any functions that run in the background as auto updates of indoor and outdoor bikes and maintenance reminders</p>
-
+  <h1>Register page</h1>
+  <p>To save link to Strava and access tools that will update activities automatically according to rules you setup</p>
+  <p>Continuing without an account will still allow you to update activities bikes manually<p>
+    
   <form method="post" action="{% url 'main:register' %}">
     {% csrf_token %}
   

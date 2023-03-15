@@ -3,6 +3,7 @@ import logging
 from django.shortcuts import render, redirect
 from django.contrib.auth.forms import UserCreationForm, PasswordChangeForm
 from django.contrib.auth import login
+from django.contrib.auth.decorators import login_required
 
 from . import stravaapi
 from .models import Bearer, Logging
@@ -17,6 +18,7 @@ def index(request):
     else:
         return render(request, 'main/index.html')
 
+@login_required
 def profile(request):
 
     changelog = Logging.objects.filter(profile=request.user.profile).order_by('datetime')[:10]
