@@ -62,10 +62,12 @@ def register(request):
     
 
 def exchange_token(request):
+    
     # need at least read access
-
+    if ('scope' not in request.GET):
+        return redirect('main:index')
     if 'activity:read_all' not in request.GET['scope'] or 'profile:read_all' not in request.GET['scope']:
-        redirect('main:index')
+        return redirect('main:index')
 
     request.session['bearer'] = stravaapi.getBearerFromCode(request.GET['code'])
     
