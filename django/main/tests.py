@@ -137,7 +137,7 @@ class TestExchangeToken(TestCase):
         self.assertTrue(mock_stravaapi.getBearerFromCode.called)
         self.assertFalse(self.client.session["stravawrite"])
         self.assertTrue('bearer' in self.client.session)
-        self.assertRedirects(response, reverse('main:register'), fetch_redirect_response=True, target_status_code=200)
+        self.assertRedirects(response, reverse('main:register'))
         
 
     def test_exchange_token_write(self, mock_stravaapi):
@@ -178,6 +178,74 @@ class TestExchangeToken(TestCase):
 
         self.assertTrue(mock_stravaapi.getBearerFromCode.called)
         self.assertEquals(user.profile.bearer.access_token, "652e222934d95f7cdadbc89b7cccccbbbbbaaaaa")
+
+
+class TestRegisterPage(TestCase):
+
+    def setUp(self):
+        self.client = Client()
+
+    def test_register_with_no_bearer(self):
+        
+        response = self.client.get(reverse('main:register'))
+
+        self.assertRedirects(response, reverse("main:index"), target_status_code=200)
+    
+    def test_register_with_bearer(self):
+
+        session = self.client.session
+        session['bearer'] = {'token_type': 'Bearer', 'expires_at': 1679343993, 'expires_in': 12399, 'refresh_token': '1401a4493980ce24c2ac755f23a50fbbbbbaaaaa', 'access_token': '652e222934d95f7cdadbc89b7cccccbbbbbaaaaa', 'athlete': {'id': 12345, 'username': None, 'resource_state': 2, 'firstname': 'Test', 'lastname': 'User', 'bio': '', 'city': 'Saint John', 'state': 'New Brunswick', 'country': 'Canada'}}
+        session.save()
+
+        response = self.client.get(reverse('main:register'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'To save link to Strava')
+
+    def test_register_account_good_pass(self):
+
+        session = self.client.session
+        session['bearer'] = {'token_type': 'Bearer', 'expires_at': 1679343993, 'expires_in': 12399, 'refresh_token': '1401a4493980ce24c2ac755f23a50fbbbbbaaaaa', 'access_token': '652e222934d95f7cdadbc89b7cccccbbbbbaaaaa', 'athlete': {'id': 12345, 'username': None, 'resource_state': 2, 'firstname': 'Test', 'lastname': 'User', 'bio': '', 'city': 'Saint John', 'state': 'New Brunswick', 'country': 'Canada'}}
+        session['stravawrite'] = True
+        session.save()
+
+        data = {'username': 'test_register_account',
+                'password1': 'testing123!@',
+                'password2': 'testing123!@'}
+        
+        response = self.client.post(reverse('main:register'), data=data)
+
+        self.assertRedirects(response, reverse('activities:activities'), fetch_redirect_response=False)
+        
+        user = User.objects.get(username='test_register_account')
+
+        self.assertIsNotNone(user)
+        self.assertIsNotNone(user.profile)
+        self.assertIsNotNone(user.profile.bearer)
+        self.assertEqual(user.profile.bearer.access_token, "652e222934d95f7cdadbc89b7cccccbbbbbaaaaa")
+
+    def test_register_account_password_mismatch(self):
+
+        session = self.client.session
+        session['bearer'] = {'token_type': 'Bearer', 'expires_at': 1679343993, 'expires_in': 12399, 'refresh_token': '1401a4493980ce24c2ac755f23a50fbbbbbaaaaa', 'access_token': '652e222934d95f7cdadbc89b7cccccbbbbbaaaaa', 'athlete': {'id': 12345, 'username': None, 'resource_state': 2, 'firstname': 'Test', 'lastname': 'User', 'bio': '', 'city': 'Saint John', 'state': 'New Brunswick', 'country': 'Canada'}}
+        session['stravawrite'] = True
+        session.save()
+
+        data = {'username': 'test_register_account',
+                'password1': 'testing123!@',
+                'password2': 'testing321!@'}
+        
+        response = self.client.post(reverse('main:register'), data=data)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "The two password fields didn")
+
+
+        
+
+
+
+
 
 
 
